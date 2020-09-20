@@ -1,9 +1,9 @@
 const _deploy_contracts = require("../migrations/2_deploy_contracts");
 
-var NewToken = artifacts.require("./NewToken.sol");
+const NewToken = artifacts.require("./NewToken.sol");
 
 contract("NewToken", function (accounts) {
-  var tokenInstance;
+  let tokenInstance;
 
   it("initializes the contract with the correct values", function () {
     return NewToken.deployed()
@@ -16,7 +16,7 @@ contract("NewToken", function (accounts) {
         return tokenInstance.symbol();
       })
       .then(function (symbol) {
-        assert.equal(symbol, "N3w", "has the correct symbol");
+        assert.equal(symbol, "N3", "has the correct symbol");
         return tokenInstance.standard();
       })
       .then(function (standard) {
