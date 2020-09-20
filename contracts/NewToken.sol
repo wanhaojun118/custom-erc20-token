@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 contract NewToken {
     string public name = "New Token";
-    string public symbol = "N3w";
+    string public symbol = "N3";
     string public standard = "New Token v1.0";
     uint256 public totalSupply;
 
