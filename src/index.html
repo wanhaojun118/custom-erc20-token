@@ -21,14 +21,14 @@
     <div id="loader">
       <p class="text-center">Loading...</p>
     </div>
-    <div id="content" class="text-center">
+    <div id="content" class="text-center" style="display: none;">
       <div>
-        <p>Token price is <span class="token-price"></span> Ether.
-          You currently have <span class="token-balance"></span> N3
+        <p>Token price is <b><span id="token-price"></span></b> Ether.
+          You currently have <b><span id="token-balance"></span></b> N3
         </p>
       </div>
       <div>
-        <form>
+        <form onSubmit="App.buyTokens(); return false;">
           <div class="form-group">
             <input type="number" id="number-of-token" name="number-of-token" class="form-control input-lg" value="1"
               min="1" pattern="[0-9]" />
@@ -37,13 +37,15 @@
             <button type="submit" class="btn btn-primary btn-lg">Buy Token(s)</button>
           </span>
         </form>
+        <br />
         <div class="progress">
           <div id="progress" class="progress-bar progress-bar-stripped active" aria-valuemin="0" aria-valuemax="100">
           </div>
         </div>
         <div class="token-sold">
-          <span class="token-sold"></span> / <span class="token-available"> tokens sold</span>
+          <span id="token-sold"></span> / <span id="token-available"></span> tokens sold
         </div>
+        <br />
         <div class="account">
           Your Account: <span id="account"></span>
         </div>
