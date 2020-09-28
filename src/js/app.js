@@ -5,7 +5,8 @@ App = {
     loading: false,
     tokenPrice: 0,
     tokenSold: 0,
-    tokensAvailable: 750000,
+    tokensAvailable: 750010,
+    tokenLeft: 0,
     init: function () {
         console.log("App initialized...");
         return App.initWeb3();
@@ -98,6 +99,12 @@ App = {
             // Load token contract
             App.contracts.NewToken.deployed().then(function (instance) {
                 newTokenInstance = instance;
+
+                return newTokenInstance.balanceOf(newTokenSaleInstance.address);
+            }).then(function (tokenSaleBalance) {
+                App.tokenLeft = tokenSaleBalance.toNumber();
+                console.log("token left: ", App.tokenLeft);
+
                 return newTokenInstance.balanceOf(App.account);
             }).then(function (balance) {
                 App.balance = balance.toNumber();
