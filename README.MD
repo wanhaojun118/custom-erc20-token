@@ -12,6 +12,21 @@ Deploy NewToken and NewTokenSale contracts to local blockchain:
 Run test on deployed contracts:
 > truffle test
 
+###### Transfer token from Token contract to Token Sale contract:
+Go to truffle console:
+> truffle console
+
+Deploy token contract:
+> NewToken.deployed().then(function(i){ tokenInstance = i; });
+
+Deploy token sale contract:
+> NewTokenSale.deployed().then(function(i){ tokenSaleInstance = i; });
+
+Get first account (admin) from Ganache
+> web3.eth.getAccounts().then(function(acc){ admin=acc[0]; });
+
+Transfer 750000 N3 token from token contract to token sale contract, so that token sale contract has token for sale:
+> tokenInstance.transfer(tokenSaleInstance.address, 750000, { from: admin });
 
 ## Front End Web Application
 For current phase, only run front end application using **develop** branch.
