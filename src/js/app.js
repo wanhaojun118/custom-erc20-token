@@ -5,7 +5,7 @@ App = {
     loading: false,
     tokenPrice: 0,
     tokenSold: 0,
-    tokensAvailable: 750010,
+    tokensAvailable: 750000,
     tokenLeft: 0,
     init: function () {
         console.log("App initialized...");
@@ -104,6 +104,8 @@ App = {
             }).then(function (tokenSaleBalance) {
                 App.tokenLeft = tokenSaleBalance.toNumber();
                 console.log("token left: ", App.tokenLeft);
+
+                $("#token-left").html(App.tokenLeft);
 
                 return newTokenInstance.balanceOf(App.account);
             }).then(function (balance) {
