@@ -1,4 +1,4 @@
-# Custom ERC-20 Token (N3 Token)
+# Custom ERC-20 Token (N3 Token) - Local Network with Ganache (OBSOLETED)
 
 ## Back End Ethereum Blockchain
 Install truffle as global package:
@@ -40,4 +40,17 @@ Ensure Metamask is installed and connected to Ganache local chain. Import one of
 
 Run web application locally:
 > npm run dev
+
+
+# Custom ERC-20 Token (N3 Token) - Ropsten Testnet
+
+Install necessary packages:
+> npm install
+
+Run web application:
+> npm run dev
+
+
+
+
 
