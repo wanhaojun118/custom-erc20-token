@@ -7,16 +7,34 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "lite-server"
+    "dev": "lite-server",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "local": "vue-cli-service build && serve -s dist",
+    "push": "vue-cli-service build && firebase deploy"
   },
   "author": "HJ",
   "license": "ISC",
   "devDependencies": {
-    "lite-server": "^2.3.0"
+    "lite-server": "^2.3.0",
+    "@vue/cli-plugin-babel": "^4.5.0",
+    "@vue/cli-plugin-router": "^4.5.0",
+    "@vue/cli-plugin-typescript": "^4.5.0",
+    "@vue/cli-plugin-vuex": "^4.5.0",
+    "@vue/cli-service": "^4.5.0",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^8.0.2",
+    "typescript": "~3.9.3",
+    "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
+    "@truffle/contract": "^4.2.25",
     "@truffle/hdwallet-provider": "^1.1.0",
+    "core-js": "^3.6.5",
     "dotenv": "^8.2.0",
+    "vue": "^2.6.11",
+    "vue-router": "^3.2.0",
+    "vuex": "^3.4.0",
     "web3": "^1.3.0"
   }
 }
