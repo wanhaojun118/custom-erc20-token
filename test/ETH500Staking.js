@@ -33,7 +33,9 @@ contract("ETH500Staking", async accounts => {
         let receipt;
         let eth500Staking = await ETH500Staking.deployed();
         const stake = await eth500Staking.stakeOf(stakeholder);
+        let balanceOfStakeholder = await web3.eth.getBalance(stakeholder);
         console.log("stake: ", Web3.utils.fromWei(stake.toString(), "ether"));
+        console.log("balance before withdraw: ", Web3.utils.fromWei(balanceOfStakeholder.toString(), "ether"));
 
         if (stake > 0) {
             receipt = await eth500Staking.withdrawStake(stakeholder, stake);
@@ -44,5 +46,8 @@ contract("ETH500Staking", async accounts => {
             const stakeholderList = await eth500Staking.getStakeholders();
             console.log("stakeholder list: ", stakeholderList);
         }
+
+        balanceOfStakeholder = await web3.eth.getBalance(stakeholder);
+        console.log("balance after withdraw: ", Web3.utils.fromWei(balanceOfStakeholder.toString(), "ether"));
     });
 });
