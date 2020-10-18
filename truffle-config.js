@@ -53,19 +53,19 @@ module.exports = {
       network_id: "*", // Any network (default: none)
     },
 
-    rinkeby: {
-      host: "localhost",
-      port: 8545,
-      network_id: 4,
-      gas: 4700000
-    },
+    // rinkeby: {
+    //   host: "localhost",
+    //   port: 8545,
+    //   network_id: 4,
+    //   gas: 4700000
+    // },
 
-    ropsten: {
-      provider: function () {
-        return new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}`, 1);
-      },
-      network_id: 3
-    }
+    // ropsten: {
+    //   provider: function () {
+    //     return new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}`, 1);
+    //   },
+    //   network_id: 3
+    // }
 
     // Another network with more advanced options...
     // advanced: {

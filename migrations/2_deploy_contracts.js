@@ -1,12 +1,7 @@
-const NewToken = artifacts.require("./NewToken.sol"); // reading token contract and assign to variable
-const NewTokenSale = artifacts.require("./NewTokenSale.sol"); // reading token sale contract
+const Minion = artifacts.require("./Minion.sol");
+const ETH500Staking = artifacts.require("./ETH500Staking.sol");
 
-module.exports = function (deployer) {
-  // deploy token contract
-  deployer.deploy(NewToken, 1000000).then(function () {
-    const tokenPrice = 1000000000000000; // 0.001 Ether
-
-    // deploy token sale contract using token contract's address
-    return deployer.deploy(NewTokenSale, NewToken.address, tokenPrice);
-  });
+module.exports = async function (deployer) {
+  await deployer.deploy(Minion, 10000);
+  await deployer.deploy(ETH500Staking, Minion.address);
 };
