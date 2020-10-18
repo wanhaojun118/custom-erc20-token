@@ -40,13 +40,13 @@ contract ETH500Staking {
     }
 
     // To add stakeholder if @param _stakeholder is not one
-    function addStakeholder(address _stakeholder) public {
+    function addStakeholder(address _stakeholder) internal {
         (bool _isStakeholder, ) = isStakeholder(_stakeholder);
         if (!_isStakeholder) stakeholders.push(_stakeholder);
     }
 
     // To remove a stakeholder if @param _stakeholder is one
-    function removeStakeholder(address _stakeholder) public {
+    function removeStakeholder(address _stakeholder) internal {
         (bool _isStakeholder, uint256 s) = isStakeholder(_stakeholder);
         if (_isStakeholder) {
             // Replace the current found stakeholder with the last stakeholder
@@ -55,6 +55,15 @@ contract ETH500Staking {
             // Remove the last stakeholder
             stakeholders.pop();
         }
+    }
+
+    function getStakeholders()
+        public
+        view
+        returns (address[] memory _stakeholders)
+    {
+        _stakeholders = stakeholders;
+        return _stakeholders;
     }
 
     // To retrieve the stake of specific stakeholder
@@ -72,6 +81,21 @@ contract ETH500Staking {
         totalStakes = SafeMath.add(totalStakes, stakes[msg.sender]); // Add stake amount to total stakes
 
         emit receivedEther(msg.sender, msg.value);
+    }
+
+    function withdrawStake(address payable _stakeholder, uint256 _amount)
+        public
+        returns (bool result)
+    {
+        require(stakes[_stakeholder] >= _amount);
+
+        _stakeholder.transfer(_amount);
+
+        if (stakes[_stakeholder] <= 0) {
+            removeStakeholder(_stakeholder);
+        }
+
+        return true;
     }
 
     // For admin to clear stake
