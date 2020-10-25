@@ -4,15 +4,17 @@ contract Minion {
     string public name = "Minion Token";
     string public symbol = "MIN";
     string public standard = "Minion Token v1.0";
-    uint256 public totalSupply;
+    uint8 public decimals = 2;
+    uint256 public totalSupply = 10000 * (uint256(10)**decimals);
 
     mapping(address => uint256) public balanceOf;
 
     event Transfer(address _from, address _to, uint256 _value);
 
-    constructor(uint256 _initialSupply) public {
-        balanceOf[msg.sender] = _initialSupply;
-        totalSupply = _initialSupply;
+    constructor() public {
+        balanceOf[msg.sender] = totalSupply;
+
+        emit Transfer(address(this), msg.sender, totalSupply);
     }
 
     function transfer(address _to, uint256 _value)

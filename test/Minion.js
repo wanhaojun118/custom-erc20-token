@@ -1,10 +1,12 @@
 const MinionToken = artifacts.require("./Minion.sol");
+let minionDecimals;
 
 contract("Minion", async accounts => {
     it("Should put 10,000 Minion in the first account", async () => {
         let tokenInstance = await MinionToken.deployed();
+        minionDecimals = await tokenInstance.decimals();
         let balance = await tokenInstance.balanceOf(accounts[0]);
-        assert.equal(balance.toNumber(), 10000);
+        assert.equal(parseInt(balance), 10000 * Math.pow(10, minionDecimals));
     });
 
     it("Should initialize with the correct name", async () => {
@@ -28,7 +30,7 @@ contract("Minion", async accounts => {
     it("Should initialize with the correct initial supply value", async () => {
         let tokenInstance = await MinionToken.deployed();
         let tokenInitialSupply = await tokenInstance.totalSupply();
-        assert.equal(tokenInitialSupply.toNumber(), 10000);
+        assert.equal(tokenInitialSupply.toNumber(), 10000 * Math.pow(10, minionDecimals));
     });
 
     it("Should reject transaction if sender does not has sufficient fund", async () => {
@@ -42,11 +44,12 @@ contract("Minion", async accounts => {
 
     it("Sender and receiver should have correct token amount after transferring token", async () => {
         let tokenInstance = await MinionToken.deployed();
-        await tokenInstance.transfer(accounts[1], 10, { from: accounts[0] });
+        const transferAmount = 10 * Math.pow(10, minionDecimals);
+        await tokenInstance.transfer(accounts[1], transferAmount, { from: accounts[0] });
         let balanceOfSender = await tokenInstance.balanceOf(accounts[0]);
         let balanceOfReceiver = await tokenInstance.balanceOf(accounts[1]);
-        assert.equal(balanceOfSender.toNumber(), 9990);
-        assert.equal(balanceOfReceiver.toNumber(), 10);
+        assert.equal(parseInt(balanceOfSender), 9990 * Math.pow(10, minionDecimals));
+        assert.equal(parseInt(balanceOfReceiver), 10 * Math.pow(10, minionDecimals));
     });
 
     it("Transaction should emit correct event", async () => {

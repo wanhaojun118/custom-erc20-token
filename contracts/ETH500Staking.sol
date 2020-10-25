@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Minion.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol"; // Import for SafeMath purpose
+import "@nomiclabs/buidler/console.sol";
 
 contract ETH500Staking {
     using SafeMath for uint256;
@@ -20,7 +21,9 @@ contract ETH500Staking {
         _;
     }
 
-    event receivedEther(address, uint256);
+    event AddStake(address sender, uint256 amount);
+    event WithdrawStake(address receiver, uint256 amount);
+    event SendReward(address stakeholder, uint256 amount);
 
     constructor(Minion _minionContract) public {
         minionContract = _minionContract; // Assign minion contract
@@ -80,20 +83,27 @@ contract ETH500Staking {
 
         totalStakes = SafeMath.add(totalStakes, stakes[msg.sender]); // Add stake amount to total stakes
 
-        emit receivedEther(msg.sender, msg.value);
+        emit AddStake(msg.sender, msg.value);
     }
 
     function withdrawStake(address payable _stakeholder, uint256 _amount)
         public
         returns (bool result)
     {
-        require(stakes[_stakeholder] >= _amount);
+        require(
+            stakes[_stakeholder] >= _amount,
+            "Insufficient stake on stake withdrawal"
+        );
 
         _stakeholder.transfer(_amount);
+
+        stakes[_stakeholder] -= _amount;
 
         if (stakes[_stakeholder] <= 0) {
             removeStakeholder(_stakeholder);
         }
+
+        emit WithdrawStake(_stakeholder, _amount);
 
         return true;
     }
@@ -111,21 +121,35 @@ contract ETH500Staking {
         return true;
     }
 
-    function distributeRewards() public onlyOwner returns (bool result) {
-        require(stakeholders.length > 0);
+    function sendReward(address _stakeholder, uint256 _amount)
+        public
+        returns (bool result)
+    {
+        require(_amount > 0, "Invalid amount on sendReward");
 
-        for (uint256 s = 0; s < stakeholders.length; s += 1) {
-            uint256 proportional = SafeMath.div(
-                stakes[stakeholders[s]],
-                totalStakes
-            );
-            uint256 reward = SafeMath.mul(proportional, 10);
+        require(minionContract.transfer(_stakeholder, _amount));
 
-            if (reward > 0) minionContract.transfer(stakeholders[s], reward);
-        }
+        emit SendReward(_stakeholder, _amount);
 
         return true;
     }
+
+    // function distributeRewards() public onlyOwner returns (bool result) {
+    //     require(stakeholders.length > 0, "No stakeholder found");
+
+    //     for (uint256 s = 0; s < stakeholders.length; s += 1) {
+    //         uint256 proportional = SafeMath.div(
+    //             stakes[stakeholders[s]],
+    //             totalStakes
+    //         );
+
+    //         uint256 _reward = SafeMath.mul(_proportional, 10);
+
+    //         if (_reward > 0) minionContract.transfer(stakeholders[s], _reward);
+    //     }
+
+    //     return result;
+    // }
 
     // function totalStakes() public view returns (uint256) {
     //     uint256 _totalStakes = 0;
