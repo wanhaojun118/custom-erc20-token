@@ -66,18 +66,28 @@ contract("ETH500Staking", async accounts => {
 
                     let stake = await eth500Staking.stakeOf(stakeholder);
                     if (parseInt(stake) > 0) {
+                        const currentTime = new Date().getTime();
                         const proportional = stake / parseFloat(totalStakes);
                         const reward = proportional * dailyDistribution;
                         const rewardInMinion = reward.toFixed(2) * Math.pow(10, minionDecimals);
-                        let receipt = await eth500Staking.sendReward(stakeholder, rewardInMinion);
+                        let receipt = await eth500Staking.sendReward(stakeholder, rewardInMinion, currentTime);
+
 
                         if (receipt) {
-                            // const balanceOfStakeholder = await minion.balanceOf(stakeholder);
-                            // console.log(`${stakeholder}'s balance: `, parseInt(balanceOfStakeholder));
+                            // console.log("receipt last reward sent time: ", parseInt(receipt.logs[0].args.lastRewardSentTime));
+                            // console.log("receipt result: ", receipt.logs[0].args.result);
+
+                            // const lastRewardSentTime = await eth500Staking.lastRewardSentTime(stakeholder);
+                            // let resend = await eth500Staking.sendReward(stakeholder, rewardInMinion, new Date().getTime());
+                            // console.log("resend result: ", resend);
+
+                            // console.log(`${stakeholder}'s last reward sent time: `, parseInt(lastRewardSentTime));
                             assert.equal(receipt.logs.length, 1, "Send reward not emitting event");
                             assert.equal(receipt.logs[0].event, "SendReward", `Send reward emitting wrong event: ${receipt.logs[0].event}`);
                             assert.equal(receipt.logs[0].args.stakeholder, stakeholder, `Stake withdrawal to wrong address: ${receipt.logs[0].args.receiver}`);
                             assert.equal(parseInt(receipt.logs[0].args.amount), rewardInMinion, `Stake withdrawal with wrong amount: ${parseInt(receipt.logs[0].args.amount)}`);
+                            assert.equal(parseInt(receipt.logs[0].args.lastRewardSentTime), currentTime, `Stake withdrawal with wrong last reward sent time: ${parseInt(receipt.logs[0].args.lastRewardSentTime)}`);
+                            assert.equal(receipt.logs[0].args.result, true, `Stake withdrawal with wrong result returned: ${parseInt(receipt.logs[0].args.result)}`);
                         }
                     }
                 }

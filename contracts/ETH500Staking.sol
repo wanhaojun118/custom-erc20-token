@@ -10,11 +10,11 @@ contract ETH500Staking {
     Minion public minionContract;
     address[] internal stakeholders;
     mapping(address => uint256) internal stakes; // Stakeholder's stake(s)
+    mapping(address => uint256) internal lastRewardSentTime;
+    uint256 internal minimumInterval = 86370000; // Minimum interval = 86370 sec (~ a day)
     uint256 public totalStakes;
 
     address owner;
-    // mapping(address => uint256) internal rewards; // Stakeholder's reward(s)
-    // uint256 internal totalRewards;
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -23,7 +23,12 @@ contract ETH500Staking {
 
     event AddStake(address sender, uint256 amount);
     event WithdrawStake(address receiver, uint256 amount);
-    event SendReward(address stakeholder, uint256 amount);
+    event SendReward(
+        address stakeholder,
+        uint256 amount,
+        uint256 lastRewardSentTime,
+        bool result
+    );
 
     constructor(Minion _minionContract) public {
         minionContract = _minionContract; // Assign minion contract
@@ -31,6 +36,7 @@ contract ETH500Staking {
         owner = msg.sender; // Set owner of the contract
     }
 
+    // To check if address is one of the stakeholders
     function isStakeholder(address _address)
         public
         view
@@ -60,6 +66,7 @@ contract ETH500Staking {
         }
     }
 
+    // Get stakeholder list
     function getStakeholders()
         public
         view
@@ -86,6 +93,7 @@ contract ETH500Staking {
         emit AddStake(msg.sender, msg.value);
     }
 
+    // To withdraw stakeholder's stake in ETH
     function withdrawStake(address payable _stakeholder, uint256 _amount)
         public
         returns (bool result)
@@ -108,85 +116,46 @@ contract ETH500Staking {
         return true;
     }
 
-    // For admin to clear stake
-    function clearStake() public returns (bool result) {
-        require(stakes[msg.sender] > 0); // Make sure stakeholder has stake
-
-        stakes[msg.sender] = SafeMath.sub(
-            stakes[msg.sender],
-            stakes[msg.sender]
-        );
-        if (stakes[msg.sender] == 0) removeStakeholder(msg.sender);
-
-        return true;
-    }
-
-    function sendReward(address _stakeholder, uint256 _amount)
-        public
-        returns (bool result)
-    {
+    // To send reward to stakeholder
+    function sendReward(
+        address _stakeholder,
+        uint256 _amount,
+        uint256 _currentTime
+    ) public {
         require(_amount > 0, "Invalid amount on sendReward");
 
-        require(minionContract.transfer(_stakeholder, _amount));
+        if (lastRewardSentTime[_stakeholder] == 0) {
+            lastRewardSentTime[_stakeholder] = _currentTime;
 
-        emit SendReward(_stakeholder, _amount);
+            require(minionContract.transfer(_stakeholder, _amount));
 
-        return true;
+            bool _result = true;
+
+            emit SendReward(
+                _stakeholder,
+                _amount,
+                lastRewardSentTime[_stakeholder],
+                _result
+            );
+        } else {
+            uint256 _interval = _currentTime - lastRewardSentTime[_stakeholder];
+            require(
+                _interval > minimumInterval,
+                "Interval between last sent is too close"
+            );
+
+            lastRewardSentTime[_stakeholder] = _currentTime;
+
+            require(minionContract.transfer(_stakeholder, _amount));
+
+            bool _result = true;
+
+            emit SendReward(
+                _stakeholder,
+                _amount,
+                lastRewardSentTime[_stakeholder],
+                _result
+            );
+        }
     }
-
-    // function distributeRewards() public onlyOwner returns (bool result) {
-    //     require(stakeholders.length > 0, "No stakeholder found");
-
-    //     for (uint256 s = 0; s < stakeholders.length; s += 1) {
-    //         uint256 proportional = SafeMath.div(
-    //             stakes[stakeholders[s]],
-    //             totalStakes
-    //         );
-
-    //         uint256 _reward = SafeMath.mul(_proportional, 10);
-
-    //         if (_reward > 0) minionContract.transfer(stakeholders[s], _reward);
-    //     }
-
-    //     return result;
-    // }
-
-    // function totalStakes() public view returns (uint256) {
-    //     uint256 _totalStakes = 0;
-    //     for (uint256 s = 0; s < stakeholders.length; s += 1) {
-    //         _totalStakes = add(_totalStakes, stakes[stakeholders[s]]); // Using openzeppelin/SafeMath "add" function
-    //     }
-
-    //     return _totalStakes;
-    // }
-
-    // function rewardOf(address _stakeholder) public view returns (uint256) {
-    //     uint256 _totalStakes = totalStakes();
-    //     uint256 _stakeholdersCount = stakesholder.length;
-
-    //     rewards[_stakeholder] = div(_stakeholdersCount, _totalStakes); // Reward of stakeholder = number of stakeholders / total stakes
-
-    //     require(rewards[_stakeholder] > 0);
-
-    //     return rewards[_stakeholder];
-    // }
-
-    // function totalRewards() public view returns (uint256) {
-    //     uint256 _totalRewards = 0;
-    //     for (uint256 s = 0; s < stakeholders.length; s += 1) {
-    //         _totalRewards = _totalRewards.add(rewards[stakeholders[s]]);
-    //     }
-
-    //     return _totalRewards;
-    // }
-
-    // function compoudRewards() public returns (bool result) {
-    //     uint256 _totalRewards = totalRewards();
-
-    //     require(_totalRewards > 0);
-
-    //     uint256 _interest = mul(_totalRewards, 10);
-
-    //     uint256 compoundedRewards = add(_totalRewards, _interest);
-    // }
 }
