@@ -10429,6 +10429,82 @@
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {
+        "0xef4919d049fef8ef69d1c2520df0e53841a2cc408d33a3ea5db9b63f1a80051c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "AddStake",
+          "type": "event"
+        },
+        "0x22ccfc04220394db1170982982777f2254a787bd31717c8c161f7e27eb0eea75": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "stakeholder",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "lastRewardSentTime",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "result",
+              "type": "bool"
+            }
+          ],
+          "name": "SendReward",
+          "type": "event"
+        },
+        "0x141ef67c4a6d3ec2adfb2f66d33c2b11de5b4f34344757554d430570b18a92ec": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "receiver",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "WithdrawStake",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x95Af92fAEbBF5e9142A3224Ef0b780D182A83cfC",
+      "transactionHash": "0x2b09a998ee5846bf23b078fedf6f1ebf771ece9d9a7a6d59f57f95e37f23783c"
+    },
     "5777": {
       "events": {
         "0xa398b89ba344a0b23a0b9de53db298b2a1a868b396c1878b7e9dcbafecd49b13": {
@@ -10583,7 +10659,7 @@
     }
   },
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-10-25T10:27:16.292Z",
+  "updatedAt": "2020-10-31T07:37:23.896Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
