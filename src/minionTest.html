@@ -6,16 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial scale=1" />
     <title>Minion Test</title>
+    <style>
+        #max-withdraw-stake {
+            text-decoration: underline;
+        }
+
+        #max-withdraw-stake:hover {
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">My Minion balance: <span id="my-balance"></span></div>
-        <div class="row">
-            <div class="d-flex flex-column">
+    <div>
+        <div>
+            <h3>Minion Token (MIN) <span id="minion-address"></span></h3>
+            <div>My Minion address: <span id="my-address"></span></div>
+            <div>My Minion balance: <span id="my-balance"></span></div>
+            <div>
                 <div>
-                    <label for="transfer-amount">Transfer Minion: </label>
-                    <input type="text" name="transfer-amount" id="transfer-amount" />
+                    <label for="transfer-amount">Transfer amount (MIN): </label>
+                    <input type="number" name="transfer-amount" id="transfer-amount" step="0.01"/>
                 </div>
 
                 <div>
@@ -25,6 +36,53 @@
                 <div>
                     <button id="send-minion-button">Send</button>
                 </div>
+                <div>
+                    <div style="visibility: hidden;" id="transfer-minion-transaction"><a target="_blank" href="" id="transfer-minion-link">Check "Transfer Minion" transaction</a></div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <hr />
+        <br />
+
+        <div>
+            <h3>ETH 500 Staking</h3>
+            <div>
+                <b>Total stake (ETH):</b> <span id="total-stake"></span>
+                <b style="margin-left: 30px;">Pool's total payout per day: </b> <span>10 MIN</span>
+            </div>
+            <br />
+            <div>
+                <label for="add-stake-amount">Add stake (ETH): </label>
+                <input type="number" name="add-stake-amount" id="add-stake-amount" step="0.01" />
+                <button id="add-stake-button">Add</button>
+                <div>
+                    <div style="visibility: hidden;" id="add-stake-transaction"><a target="_blank" id="add-stake-link">Check "Add Stake" transaction</a></div>
+                </div>
+            </div>
+            <div>
+                <label for="withdraw-stake-amount">Withdraw stake (ETH): </label>
+                <input type="number" name="withdraw-stake-amount" id="withdraw-stake-amount" step="0.01" />
+                <span id="max-withdraw-stake">Max</span>
+                <button id="withdraw-stake-button">Withdraw</button>
+                <div>
+                    <div style="visibility: hidden;" id="withdraw-stake-transaction"><a target="_blank" id="withdraw-stake-link">Check "Withdraw Stake" transaction</a></div>
+                </div>
+            </div>
+            
+            <div>My total stake (ETH): <span id="my-stake"></span></div>
+            <div>
+                My ROI (MIN): <span id="my-roi"></span>
+                <button id="harvest-reward">Harvest</button>
+            </div>
+            <div>
+                <div style="visibility: hidden;" id="harvest-reward-transaction"><a target="_blank" id="harder-reward-link">Check "Harvest Reward" transaction</a></div>
+            </div>
+            <br />
+            <div>
+                <b>Stakeholder list</b>
+                <ol id="stakeholder-list"></ol>
             </div>
         </div>
     </div>
