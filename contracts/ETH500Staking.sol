@@ -83,12 +83,15 @@ contract ETH500Staking {
 
     // For user to deposit stake
     function addStake() public payable {
-        require(stakes[msg.sender] == 0); // Make sure the user has no stake record
+        if (stakes[msg.sender] == 0) {
+            stakes[msg.sender] = msg.value; // Create new stake for sender
+        }else{
+            stakes[msg.sender] = SafeMath.add(stakes[msg.sender], msg.value); // Add amount to existing stake
+        }
 
-        if (stakes[msg.sender] == 0) addStakeholder(msg.sender); // Add stakeholder to stakeholders list
-        stakes[msg.sender] = SafeMath.add(stakes[msg.sender], msg.value); // Add stake value
+        totalStakes = SafeMath.add(totalStakes, msg.value); // Add stake amount to total stakes
 
-        totalStakes = SafeMath.add(totalStakes, stakes[msg.sender]); // Add stake amount to total stakes
+        addStakeholder(msg.sender); // Add stakeholder to stakeholders list
 
         emit AddStake(msg.sender, msg.value);
     }
