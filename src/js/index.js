@@ -32,6 +32,80 @@ const toggleWithdrawStakeFeature = (stakeAmount) => {
     }
 }
 
+const updateMyMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(myAddress).call();
+    if(balance){
+        document.getElementById("my-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(2);
+    }
+}
+
+const updateStakingContractMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(eth500StakingAddress).call();
+    if(balance){
+        document.getElementById("staking-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(2);
+    }
+}
+
+const updateTotalStake = async () => {
+    // Get total stake
+    const totalStake = await eth500Staking.methods.totalStakes().call();
+    if(totalStake){
+        document.getElementById("total-stake").innerHTML = web3.utils.fromWei(totalStake, "ether");
+    }
+}
+
+const updateMyStake = async () => {
+    const myStake = await eth500Staking.methods.stakeOf(myAddress).call();
+    if(myStake){
+        document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
+    }
+}
+
+const getRoi = async () => {
+    const myStake = await eth500Staking.methods.stakeOf(myAddress).call();
+    const totalStake = await eth500Staking.methods.totalStakes().call();
+    if(parseInt(myStake) > 0 && parseInt(totalStake) > 0){
+        const proportional = myStake / totalStake;
+        const interest  = (proportional * dailyPayout).toFixed(2);
+        document.getElementById("my-roi").innerHTML = interest;
+
+        if(interest > 0){
+            // Harvest interest
+            document.getElementById("harvest-interest").addEventListener("click", async () => {
+                const interestInMinion = parseInt(interest * Math.pow(10, minionDecimals));
+
+                console.log("interest in minion: ", interestInMinion);
+                if(interestInMinion > 0){
+                    let harvestInterest = await eth500Staking.methods.harvestInterest(myAddress, interestInMinion);
+
+                    let tx = harvestInterest.send({
+                        from: myAddress,
+                    }).on("transactionHash", txHash => {
+                        console.log("Harvest tx hash: ", txHash);
+                        
+                        document.getElementById("harvest-interest-link").href = ropstenTestUrlPrefix + txHash;
+                        document.getElementById("harvest-interest-transaction").style.visibility = "visible";
+                    }).on("receipt", receipt => {
+                        console.log("Harvest receipt: ", receipt);
+                        updateMyMinionBalance();
+                        updateStakingContractMinionBalance();
+                    }).on("error", (error, receipt) => {
+                        console.log("Error in harvest interest: ", error);
+                        if(receipt && Object.keys(receipt).length > 0){
+                            console.log("Error in harvest interest, receipt: ", receipt);
+                        }
+                    });
+                }
+            });
+        }else{
+            document.getElementById("harvest-interest").disabled = true;
+        }
+    }else{
+        document.getElementById("harvest-interest").disabled = true;
+        document.getElementById("my-roi").innerHTML = "0";
+    }
+}
+
 window.addEventListener("load", async () => {
     if (window.location.href.indexOf("minionTest.html") < 0) {
         window.location.href = window.location.href + "minionTest.html";
@@ -54,9 +128,10 @@ window.addEventListener("load", async () => {
                 if (Object.keys(minion).length > 0) {
                     minionDecimals = await minion.methods.decimals().call();
                     document.getElementById("my-address").innerHTML = myAddress;
-                    const balance = await minion.methods.balanceOf(myAddress).call();
-                    document.getElementById("my-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(2);
+                    updateMyMinionBalance();
+                    updateStakingContractMinionBalance();
 
+                    // Transfer Minion
                     const sendMinionBtn = document.getElementById("send-minion-button");
                     if (sendMinionBtn) {
                         sendMinionBtn.addEventListener("click", async () => {
@@ -75,6 +150,8 @@ window.addEventListener("load", async () => {
                                     document.getElementById("transfer-minion-transaction").style.visibility = "visible";
                                 }).on("receipt", receipt => {
                                     console.log("Transfer Minion receipt: ", receipt);
+                                    updateMyMinionBalance();
+                                    updateStakingContractMinionBalance();
                                 }).on("error", (error, receipt) => {
                                     console.log("Error in transfer Minion: ", error);
                                     if(receipt && Object.keys(receipt).length > 0){
@@ -94,23 +171,20 @@ window.addEventListener("load", async () => {
                 eth500StakingAddress = eth500StakingContractFile.networks["3"].address;
             }).done(async () => {
                 eth500Staking = new web3.eth.Contract(eth500StakingAbi, eth500StakingAddress);
+                document.getElementById("staking-contract-address").innerHTML = eth500StakingAddress;
                 if (Object.keys(eth500Staking).length > 0) {
+                    updateTotalStake();
+                    updateMyStake();
 
                     // Check user available stake
-                    checkStakeInterval = setInterval(async () => {
-                        let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
+                    // checkStakeInterval = setInterval(async () => {
+                    //     let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
 
-                        toggleWithdrawStakeFeature(myStake);
+                    //     toggleWithdrawStakeFeature(myStake);
 
-                        document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
-                    }, 3000);
+                    //     document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
+                    // }, 3000);
 
-                    // Get total stake
-                    const totalStake = await eth500Staking.methods.totalStakes().call();
-                    if(totalStake){
-                        document.getElementById("total-stake").innerHTML = web3.utils.fromWei(totalStake, "ether");
-                    }
-                    
                     // Add stake
                     document.getElementById("add-stake-button").addEventListener("click", async () => {
                         const stake = document.getElementById("add-stake-amount").value;
@@ -133,8 +207,10 @@ window.addEventListener("load", async () => {
                                 }
                             }).on("receipt", async receipt => {
                                 console.log("Add stake receipt: ", receipt);
-                                myStake = await eth500Staking.methods.stakeOf(myAddress).call();
-                                document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
+                                
+                                updateTotalStake();
+                                updateMyStake();
+                                getRoi();
                             }).on("error", (error, receipt) => {
                                 console.log("Error in withdraw stake: ", error);
                                 if(receipt && Object.keys(receipt).length > 0){
@@ -160,7 +236,10 @@ window.addEventListener("load", async () => {
                                 document.getElementById("withdraw-stake-link").href =  ropstenTestUrlPrefix + txHash;
                                 document.getElementById("withdraw-stake-transaction").style.visibility = "visible";
                             }).on("receipt", receipt => {
-                                console.log("withdraw stake receipt: ", receipt)
+                                console.log("withdraw stake receipt: ", receipt);
+                                updateTotalStake();
+                                updateMyStake();
+                                getRoi();
                             }).on("error", (error, receipt) => {
                                 console.log("Error in withdraw stake: ", error);
                                 if(receipt && Object.keys(receipt).length > 0){
@@ -179,6 +258,7 @@ window.addEventListener("load", async () => {
                     // Get stakeholders list
                     const stakeholders = await eth500Staking.methods.getStakeholders().call();
                     if(stakeholders.length > 0){
+                        document.getElementById("empty-stakeholder-message").style.display = "none";
                         const stakeholderList = document.getElementById("stakeholder-list");
                         
                         for(let stakeholder of stakeholders){
@@ -187,41 +267,13 @@ window.addEventListener("load", async () => {
                             li.appendChild(stakeholderAddress);
                             stakeholderList.appendChild(li);
                         }
+                    }else{
+                        document.getElementById("empty-stakeholder-message").style.display = "block";
                     }
 
                     // Get my ROI
                     // const stakeholders = await eth500Staking.methods.getStakeholders().call();
-                    let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
-                    const proportional = myStake / totalStake;
-                    const reward  = (proportional * dailyPayout).toFixed(2);
-                    document.getElementById("my-roi").innerHTML = reward;
-                    
-                    // Harvest reward
-                    document.getElementById("harvest-reward").addEventListener("click", async () => {
-                        const rewardInMinion = parseInt(reward * Math.pow(10, minionDecimals));
-                        const currentTime = new Date().getTime();
-
-                        console.log("reward in minion: ", rewardInMinion);
-                        if(rewardInMinion > 0){
-                            let sendReward = await eth500Staking.methods.sendReward(myAddress, rewardInMinion, currentTime);
-
-                            let tx = sendReward.send({
-                                from: myAddress,
-                            }).on("transacationHash", txHash => {
-                                console.log("Harvest tx hash: ", txHash);
-                                
-                                document.getElementById("harvest-reward-link").href = ropstenTestUrlPrefix + txHash;
-                                document.getElementById("harvest-reward-transaction").style.visibility = "visible";
-                            }).on("receipt", receipt => {
-                                console.log("Harvest receipt: ", receipt);
-                            }).on("error", (error, receipt) => {
-                                console.log("Error in harvest reward: ", error);
-                                if(receipt && Object.keys(receipt).length > 0){
-                                    console.log("Error in harvest reward, receipt: ", receipt);
-                                }
-                            });
-                        }
-                    });
+                    getRoi();
                 } else {
                     console.error("Error in reading ETH 500 staking contract");
                 }

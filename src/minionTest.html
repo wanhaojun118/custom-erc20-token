@@ -47,10 +47,11 @@
         <br />
 
         <div>
-            <h3>ETH 500 Staking</h3>
+            <h3>ETH 500 Staking <span id="staking-contract-address"></span></h3>
             <div>
                 <b>Total stake (ETH):</b> <span id="total-stake"></span>
-                <b style="margin-left: 30px;">Pool's total payout per day: </b> <span>10 MIN</span>
+                <b style="margin-left: 30px;">Pool's total payout per day (MIN): </b><span>10</span>
+                <b style="margin-left: 30px; ">Pool's balance (MIN): </b><span id="staking-contract-minion-balance"></span>
             </div>
             <br />
             <div>
@@ -74,14 +75,15 @@
             <div>My total stake (ETH): <span id="my-stake"></span></div>
             <div>
                 My ROI (MIN): <span id="my-roi"></span>
-                <button id="harvest-reward">Harvest</button>
+                <button id="harvest-interest">Harvest</button>
             </div>
             <div>
-                <div style="visibility: hidden;" id="harvest-reward-transaction"><a target="_blank" id="harder-reward-link">Check "Harvest Reward" transaction</a></div>
+                <div style="visibility: hidden;" id="harvest-interest-transaction"><a target="_blank" id="harvest-interest-link">Check "Harvest Interest" transaction</a></div>
             </div>
             <br />
             <div>
                 <b>Stakeholder list</b>
+                <div id="empty-stakeholder-message" style="display: none;">- No stakeholder found -</div>
                 <ol id="stakeholder-list"></ol>
             </div>
         </div>

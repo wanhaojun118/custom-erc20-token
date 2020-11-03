@@ -49,7 +49,7 @@ contract NewToken {
     }
 
     // Approve function
-    // Called by owner, to pass in the spendre and value of allowance
+    // Called by owner, to pass in the spender and value of allowance
     function approve(address _spender, uint256 _value)
         public
         returns (bool success)
