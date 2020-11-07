@@ -30,8 +30,14 @@ contract("Minion", async accounts => {
     it("Should initialize with the correct initial supply value", async () => {
         let tokenInstance = await MinionToken.deployed();
         let tokenInitialSupply = await tokenInstance.totalSupply();
-        assert.equal(tokenInitialSupply.toNumber(), 10000 * Math.pow(10, minionDecimals));
+        assert.equal(tokenInitialSupply.toNumber(), 10000 * Math.pow(10, minionDecimals), "Wrong initial supply value");
     });
+
+    it("Should initialize with the correct decimal value", async () => {
+        let tokenInstance = await MinionToken.deployed();
+        let tokenDecimals = await tokenInstance.decimals();
+        assert.equal(tokenDecimals, 10, "Wrong decimal places detected");
+    })
 
     it("Should reject transaction if sender does not has sufficient fund", async () => {
         let tokenInstance = await MinionToken.deployed();
@@ -46,7 +52,7 @@ contract("Minion", async accounts => {
         let tokenInstance = await MinionToken.deployed();
         const transferAmount = 10 * Math.pow(10, minionDecimals);
         await tokenInstance.transfer(accounts[1], transferAmount, { from: accounts[0] });
-        let balanceOfSender = await tokenInstance.balanceOf(accounts[0]);
+        balanceOfSender = await tokenInstance.balanceOf(accounts[0]);
         let balanceOfReceiver = await tokenInstance.balanceOf(accounts[1]);
         assert.equal(parseInt(balanceOfSender), 9990 * Math.pow(10, minionDecimals));
         assert.equal(parseInt(balanceOfReceiver), 10 * Math.pow(10, minionDecimals));
@@ -59,6 +65,6 @@ contract("Minion", async accounts => {
         assert.equal(receipt.logs[0].event, "Transfer", "Should emit 'Transfer' event");
         assert.equal(receipt.logs[0].args._from, accounts[0], `Sender should be ${accounts[0]}`);
         assert.equal(receipt.logs[0].args._to, accounts[1], `Receiver should be ${accounts[1]}`);
-        assert.equal(receipt.logs[0].args._value.toNumber(), 200, "Value should be 200");
+        assert.equal(receipt.logs[0].args._amount.toNumber(), 200, "Value should be 200");
     });
 });

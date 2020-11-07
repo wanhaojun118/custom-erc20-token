@@ -4,7 +4,7 @@ contract Minion {
     string public name = "Minion Token";
     string public symbol = "MIN";
     string public standard = "Minion Token v1.0";
-    uint8 public decimals = 2;
+    uint8 public decimals = 10;
     uint256 public totalSupply = 10000 * (uint256(10)**decimals);
 
     mapping(address => uint256) public balanceOf;
