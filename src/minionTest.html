@@ -91,8 +91,32 @@
         <hr/>
         <br/>
         <div>
-            <h3>Minion Transfer test: <span id="minion-transfer-address"></span></h3>
-            <button id="transfer-minion-button">Trasnfer Minion</button>
+            <h3>USDT Token (Tether USDT) <span id="usdt-address"></span></h3>
+            <div>My USDT address: <span id="my-usdt-address"></span></div>
+            <div>My USDT balance: <span id="my-usdt-balance"></span></div>
+        </div>
+        <br/>
+        <div>
+            <h3>USDT500 Staking <span id="usdt500-staking-address"></span></h3>
+            <div>
+                <b>Total stake (USDT):</b> <span id="usdt500-total-stake"></span>
+                <b style="margin-left: 30px;">Pool's total payout per day (MIN): </b><span>10</span>
+                <b style="margin-left: 30px; ">Pool's balance (MIN): </b><span id="usdt500-staking-contract-minion-balance"></span>
+            </div>
+            <div style="margin: 15px 0px 5px;"><b>---------------------------- Add Stake Demo ----------------------------</b></div>
+            <div id="usdt500-approve-section">
+                <button id="usdt500-approve-button">Approve</button>
+                <div style="display:none;" id="usdt500-approve-transaction"><a target="_blank" id="usdt500-approve-link">Check "Approve" transaction</a></div>
+            </div>
+            <div id="usdt500-add-stake-section">
+                <div>
+                    <label for="usdt500-add-stake-amount">Add stake (USDT): </label>
+                    <input type="number" name="usdt500-add-stake-amount" id="usdt500-add-stake-amount" step="0.01"/>
+                    <button id="usdt500-add-stake-button">Add stake</button>
+                    <div>Staking allowance approved by me: <span id="usdt500-staking-allowance"></span></div>
+                </div>
+                <div style="display:none;" id="usdt500-add-stake-transaction"><a target="_blank" id="usdt500-add-stake-link">Check "USDT500 Add Stake" transaction</a></div>
+            </div>
         </div>
     </div>
     <script src="js/jquery-3.5.1.min.js"></script>

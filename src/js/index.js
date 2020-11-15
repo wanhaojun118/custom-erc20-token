@@ -10,88 +10,14 @@ var myAddress;
 var checkStakeInterval = null;
 var dailyPayout = 10;
 var ropstenTestUrlPrefix = "https://ropsten.etherscan.io/tx/";
-var usdtAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-var usdtAbi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_upgradedAddress","type":"address"}],"name":"deprecate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"deprecated","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_evilUser","type":"address"}],"name":"addBlackList","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"upgradedAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"balances","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"maximumFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"_totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"unpause","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_maker","type":"address"}],"name":"getBlackListStatus","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"},{"name":"","type":"address"}],"name":"allowed","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"paused","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"who","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"pause","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"newBasisPoints","type":"uint256"},{"name":"newMaxFee","type":"uint256"}],"name":"setParams","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"issue","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"redeem","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"basisPointsRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"isBlackListed","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_clearedUser","type":"address"}],"name":"removeBlackList","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"MAX_UINT","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_blackListedUser","type":"address"}],"name":"destroyBlackFunds","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_initialSupply","type":"uint256"},{"name":"_name","type":"string"},{"name":"_symbol","type":"string"},{"name":"_decimals","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"amount","type":"uint256"}],"name":"Issue","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"amount","type":"uint256"}],"name":"Redeem","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"newAddress","type":"address"}],"name":"Deprecate","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"feeBasisPoints","type":"uint256"},{"indexed":false,"name":"maxFee","type":"uint256"}],"name":"Params","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_blackListedUser","type":"address"},{"indexed":false,"name":"_balance","type":"uint256"}],"name":"DestroyedBlackFunds","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_user","type":"address"}],"name":"AddedBlackList","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_user","type":"address"}],"name":"RemovedBlackList","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[],"name":"Pause","type":"event"},{"anonymous":false,"inputs":[],"name":"Unpause","type":"event"}];
-var minionTrasnferAddress = "0x51229837f739e11e2a5e04a698210fd7c7d83f73";
-var minionTransferAbi = [
-    {
-        "inputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "USDTInstance",
-        "outputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_addressToCheck",
-                "type": "address"
-            }
-        ],
-        "name": "checkUSDTBalance",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "checkUSDTToSupply",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_receiver",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "receiveUSDT",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-];
+var usdtAbi;
+var usdtAddress;
+var usdt;
+var usdtTotalSupply;
+var usdtDecimals;
+var usdt500StakingAbi;
+var usdt500StakingAddress;
+var usdt500Staking;
 
 const initWeb3 = () => {
     if (window.ethereum) {
@@ -117,14 +43,7 @@ const toggleWithdrawStakeFeature = (stakeAmount) => {
 const updateMyMinionBalance = async () => {
     const balance = await minion.methods.balanceOf(myAddress).call();
     if(balance){
-        document.getElementById("my-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(2);
-    }
-}
-
-const updateStakingContractMinionBalance = async () => {
-    const balance = await minion.methods.balanceOf(eth500StakingAddress).call();
-    if(balance){
-        document.getElementById("staking-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(2);
+        document.getElementById("my-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
     }
 }
 
@@ -134,6 +53,39 @@ const updateTotalStake = async () => {
     if(totalStake){
         document.getElementById("total-stake").innerHTML = web3.utils.fromWei(totalStake, "ether");
     }
+}
+
+const updateMyUSDTBalance = async () => {
+    const balance = await usdt.methods.balanceOf(myAddress).call();
+    if(balance){
+        document.getElementById("my-usdt-balance").innerHTML = (balance / Math.pow(10, usdtDecimals)).toFixed(usdtDecimals);
+    }
+}
+
+const updateStakingContractMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(eth500StakingAddress).call();
+    if(balance){
+        document.getElementById("staking-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+    }
+}
+
+const updateUSDT500StakingContractTotalStake = async () => {
+    const totalStakes = await usdt500Staking.methods.totalStakes().call();
+    if(totalStakes){
+        document.getElementById("usdt500-total-stake").innerHTML = (totalStakes / Math.pow(10, usdtDecimals)).toFixed(usdtDecimals);
+    }
+}
+
+const updateUSDT500StakingContractMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(usdt500StakingAddress).call();
+    if(balance){
+        document.getElementById("usdt500-staking-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals)
+    }
+}
+
+const updateUSDT500Allowance = async () => {
+    const allowance = await usdt.methods.allowance(myAddress, usdt500StakingAddress).call();
+    document.getElementById("usdt500-staking-allowance").innerHTML = (allowance / Math.pow(10, usdtDecimals)).toFixed(usdtDecimals);
 }
 
 const updateMyStake = async () => {
@@ -188,6 +140,67 @@ const getRoi = async () => {
     }
 }
 
+const checkUSDTAllowance = async () => {
+    const allowance = await usdt.methods.allowance(myAddress, usdt500StakingAddress).call();
+    const approveSection = document.getElementById("usdt500-approve-section");
+    const addStakeSection = document.getElementById("usdt500-add-stake-section");
+    const approveButton = document.getElementById("usdt500-approve-button");
+    const addStakeButton = document.getElementById("usdt500-add-stake-button");
+
+    if(allowance <= 0){
+        // USDT500 Approve
+
+        approveSection.style.display = "block";
+        addStakeSection.style.display = "none";
+
+        approveButton.addEventListener("click", async () => {
+            const approve = await usdt.methods.approve(usdt500StakingAddress, usdtTotalSupply);
+            approve.send({
+                from: myAddress
+            }).on("transactionHash", txHash => {
+                document.getElementById("usdt500-approve-link").href = ropstenTestUrlPrefix + txHash;
+                document.getElementById("usdt500-approve-transaction").style.display = "block";
+            }).on("receipt", receipt => {
+                console.log("USDT500 approve receipt: ", receipt);
+                checkUSDTAllowance();
+            }).on("error", (error, receipt) => {
+                console.log("Error in USDT500 approve trasaction: ", error);
+                if(receipt && Object.keys(receipt).length > 0){
+                    console.log("Error in USDT500 approve trasaction, receipt: ", receipt);
+                }
+            });
+        });
+    }else{
+        // USDT500 Add stake
+
+        approveSection.style.display = "none";
+        addStakeSection.style.display = "block";
+
+        addStakeButton.addEventListener("click", async () => {
+            const addStakeAmount = document.getElementById("usdt500-add-stake-amount").value * Math.pow(10, usdtDecimals);
+            if(addStakeAmount > 0){
+                const usdt500AddStake = await usdt500Staking.methods.addStake(myAddress, addStakeAmount);
+                usdt500AddStake.send({
+                    from: myAddress
+                }).on("transactionHash", txHash => {
+                    document.getElementById("usdt500-add-stake-link").href = ropstenTestUrlPrefix + txHash;
+                    document.getElementById("usdt500-add-stake-transaction").style.display = "block";
+                }).on("receipt", receipt => {
+                    console.log("USDT500 add stake receipt: ", receipt);
+                    updateMyUSDTBalance();
+                    updateUSDT500Allowance();
+                    updateUSDT500StakingContractTotalStake();
+                }).on("error", (error, receipt) => {
+                    console.log("Error in USDT500 add stake trasaction: ", error);
+                    if(receipt && Object.keys(receipt).length > 0){
+                        console.log("Error in USDT500 add stake trasaction, receipt: ", receipt);
+                    }
+                });
+            }
+        })
+    }
+}
+
 window.addEventListener("load", async () => {
     if (window.location.href.indexOf("minionTest.html") < 0) {
         window.location.href = window.location.href + "minionTest.html";
@@ -200,7 +213,7 @@ window.addEventListener("load", async () => {
             const accountAddresses = await web3.eth.getAccounts();
             myAddress = accountAddresses[0];
 
-            // Read contracts
+            // Minion contract
             $.getJSON("Minion.json", (minionContractFile) => {
                 minionAbi = minionContractFile.abi;
                 minionAddress = minionContractFile.networks["3"].address;
@@ -212,6 +225,7 @@ window.addEventListener("load", async () => {
                     document.getElementById("my-address").innerHTML = myAddress;
                     updateMyMinionBalance();
                     updateStakingContractMinionBalance();
+                    updateUSDT500StakingContractMinionBalance();
 
                     // Transfer Minion
                     const sendMinionBtn = document.getElementById("send-minion-button");
@@ -234,6 +248,7 @@ window.addEventListener("load", async () => {
                                     console.log("Transfer Minion receipt: ", receipt);
                                     updateMyMinionBalance();
                                     updateStakingContractMinionBalance();
+                                    updateUSDT500StakingContractMinionBalance
                                 }).on("error", (error, receipt) => {
                                     console.log("Error in transfer Minion: ", error);
                                     if(receipt && Object.keys(receipt).length > 0){
@@ -248,6 +263,7 @@ window.addEventListener("load", async () => {
                 }
             });
 
+            // ETH500 Staking contract
             $.getJSON("ETH500Staking.json", (eth500StakingContractFile) => {
                 eth500StakingAbi = eth500StakingContractFile.abi;
                 eth500StakingAddress = eth500StakingContractFile.networks["3"].address;
@@ -361,36 +377,38 @@ window.addEventListener("load", async () => {
                 }
             });
 
-            const minionTransferInstance = new web3.eth.Contract(minionTransferAbi, minionTrasnferAddress);
-            console.log("Minion Transfer contract: ", minionTransferInstance);
+            // USDT500 Staking contract
+            $.getJSON("USDT500Staking.json", usdt500StakingContractFile => {
+                usdt500StakingAbi = usdt500StakingContractFile.abi;
+                usdt500StakingAddress = usdt500StakingContractFile.networks["3"].address;
+            }).done(async () => {
+                usdt500Staking = new web3.eth.Contract(usdt500StakingAbi, usdt500StakingAddress);
+                document.getElementById("usdt500-staking-address").innerHTML = usdt500StakingAddress;
+                const totalStake = await usdt500Staking.methods.totalStakes().call();
+                document.getElementById("usdt500-total-stake").innerHTML = totalStake;
 
-            const usdtInstance = new web3.eth.Contract(usdtAbi, usdtAddress);
+                // USDT contract
+                $.getJSON("USDT.json", usdtContractFile => {
+                    usdtAbi = usdtContractFile.abi;
+                    usdtAddress = usdtContractFile.networks["3"].address;
+                }).done(async () => {
+                    
+                    usdt = new web3.eth.Contract(usdtAbi, usdtAddress);
+                    usdtTotalSupply = await usdt.methods.totalSupply().call();
+                    usdtDecimals = await usdt.methods.decimals().call();
 
-            if(usdtInstance){
-                document.getElementById("minion-transfer-address").innerHTML = usdtAddress;
-                console.log("usdt instance: ", usdtInstance);
+                    document.getElementById("usdt-address").innerHTML = usdtAddress;
+                    document.getElementById("my-usdt-address").innerHTML = myAddress;
 
-                document.getElementById("transfer-minion-button").addEventListener("click", async () => {
-                    const usdtBalance = await usdtInstance.methods.name().call();
-                    // const usdtTotalSupply = await minionTransferInstance.methods.checkUSDTToSupply().call();
-                    // const usdtTransfer = await usdtInstance.methods.transfer(myAddress, 1);
-                    // await usdtTransfer.send({
-                    //     from: myAddress
-                    // }).on("transactionHash", txHash => {
-                    //     console.log("transfer Minion transaction hash: ", txHash);
-                    // }).on("receipt", receipt => {
-                    //     console.log("transfer Minion receipt: ", receipt);
-                    // }).on("error", (error, receipt) => {
-                    //     console.log("Error in transfer USDT: ", error);
-                    //     if(receipt && Object.keys(receipt).length > 0){
-                    //         console.log("Error in transfer USDT, receipt: ", receipt);
-                    //     }
-                    // });
+                    updateMyUSDTBalance();
+                    updateUSDT500StakingContractTotalStake();
+                    updateUSDT500StakingContractMinionBalance();
+                    updateUSDT500Allowance();
 
-                    console.log("My USDT balance: ", usdtBalance);
+                    // Check contract's allowance approved by user
+                    checkUSDTAllowance();
                 });
-            }
-            
+            });
             
             // console.log("checksum address of Tether USDT: ", web3.utils.toChecksumAddress("0x6ee856ae55b6e1a249f04cd3b947141bc146273c"));
         } else {
