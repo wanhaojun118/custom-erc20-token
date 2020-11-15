@@ -1,23 +1,40 @@
 pragma solidity ^0.5.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "./Minion.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol"; // Import for SafeMath purpose
+import "@nomiclabs/buidler/console.sol";
 
 contract ETH500Staking {
-    using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    IERC20 public MinionInstance;
+    Minion public minionContract;
     address[] internal stakeholders;
     mapping(address => uint256) internal stakes; // Stakeholder's stake(s)
+    mapping(address => uint256) internal lastRewardSentTime;
+    uint256 internal minimumInterval = 86370000; // Minimum interval = 86370 sec (~ a day)
     uint256 public totalStakes;
+
+    address owner;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
     event AddStake(address sender, uint256 amount);
     event WithdrawStake(address receiver, uint256 amount);
     event HarvestInterest(address stakeholder, uint256 amount);
+    // event SendReward(
+    //     address stakeholder,
+    //     uint256 amount,
+    //     uint256 lastRewardSentTime,
+    //     bool result
+    // );
 
-    constructor(address _MinionAddress) public {
-        MinionInstance = ERC20(_MinionAddress); // Assign minion contract
+    constructor(Minion _minionContract) public {
+        minionContract = _minionContract; // Assign minion contract
+
+        owner = msg.sender; // Set owner of the contract
     }
 
     // To check if address is one of the stakeholders
@@ -92,9 +109,9 @@ contract ETH500Staking {
 
         _stakeholder.transfer(_amount);
 
-        stakes[_stakeholder] = SafeMath.sub(stakes[_stakeholder], _amount);
+        stakes[_stakeholder] -= _amount;
 
-        totalStakes = SafeMath.sub(totalStakes, _amount);
+        totalStakes -= _amount;
 
         if (stakes[_stakeholder] <= 0) {
             removeStakeholder(_stakeholder);
@@ -107,7 +124,7 @@ contract ETH500Staking {
 
     // To harvest interest
     function harvestInterest(address _stakeholder, uint256 _amount) public returns (bool _success) {
-        uint256 _balanceOfContract = MinionInstance.balanceOf(address(this));
+        uint256 _balanceOfContract = minionContract.balanceOf(address(this));
         _success = (_balanceOfContract >= _amount);
         require(_success, "Insufficient amount in ETH500 staking pool");
 
@@ -118,11 +135,54 @@ contract ETH500Staking {
         _success = _isStakeholder;
         require(_success, "Requester is not our stakeholder");
 
-        _success = MinionInstance.transfer(_stakeholder, _amount);
+        _success = minionContract.transfer(_stakeholder, _amount);
         require(_success, "Transfer failed on Minion contract");
 
         emit HarvestInterest(_stakeholder, _amount);
 
         return _success;
     }
+
+    // To send reward to stakeholder
+    // function sendReward(
+    //     address _stakeholder,
+    //     uint256 _amount,
+    //     uint256 _currentTime
+    // ) public {
+    //     require(_amount > 0, "Invalid amount on sendReward");
+
+    //     if (lastRewardSentTime[_stakeholder] == 0) {
+    //         lastRewardSentTime[_stakeholder] = _currentTime;
+
+    //         require(minionContract.transfer(_stakeholder, _amount));
+
+    //         bool _result = true;
+
+    //         emit SendReward(
+    //             _stakeholder,
+    //             _amount,
+    //             lastRewardSentTime[_stakeholder],
+    //             _result
+    //         );
+    //     } else {
+    //         uint256 _interval = _currentTime - lastRewardSentTime[_stakeholder];
+    //         require(
+    //             _interval > minimumInterval,
+    //             "Interval between last sent is too close"
+    //         );
+
+    //         lastRewardSentTime[_stakeholder] = _currentTime;
+
+    //         require(minionContract.transfer(_stakeholder, _amount));
+
+    //         bool _result = true;
+
+    //         emit SendReward(
+    //             _stakeholder,
+    //             _amount,
+    //             lastRewardSentTime[_stakeholder],
+    //             _result
+    //         );
+    //     }
+    // }
 }
