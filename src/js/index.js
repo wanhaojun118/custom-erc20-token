@@ -18,6 +18,9 @@ var usdtDecimals;
 var usdt500StakingAbi;
 var usdt500StakingAddress;
 var usdt500Staking;
+var minion1000StakingAbi;
+var minion1000StakingAddress;
+var minion1000Staking;
 
 const initWeb3 = () => {
     if (window.ethereum) {
@@ -92,6 +95,20 @@ const updateMyStake = async () => {
     const myStake = await eth500Staking.methods.stakeOf(myAddress).call();
     if(myStake){
         document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
+    }
+}
+
+const updateMinion1000StakingContractTotalStake = async () => {
+    const totalStakes = await minion1000Staking.methods.totalStakes().call();
+    if(totalStakes){
+        document.getElementById("minion1000-total-stake").innerHTML = (totalStakes / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+    }
+}
+
+const updateMinion1000StakingContractMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(minion1000StakingAddress).call();
+    if(balance){
+        document.getElementById("minion1000-staking-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals)
     }
 }
 
@@ -408,6 +425,16 @@ window.addEventListener("load", async () => {
                     // Check contract's allowance approved by user
                     checkUSDTAllowance();
                 });
+            });
+
+            $.getJSON("Minion1000Staking.json", minion1000ContractFile => {
+                minion1000StakingAbi = minion1000ContractFile.abi;
+                minion1000StakingAddress = minion1000ContractFile.networks["3"].address;
+            }).done(async () => {
+                minion1000Staking = new web3.eth.Contract(minion1000StakingAbi, minion1000StakingAddress);
+                document.getElementById("minion1000-staking-address").innerHTML = minion1000StakingAddress;
+                updateMinion1000StakingContractTotalStake();
+                updateMinion1000StakingContractMinionBalance();
             });
             
             // console.log("checksum address of Tether USDT: ", web3.utils.toChecksumAddress("0x6ee856ae55b6e1a249f04cd3b947141bc146273c"));
