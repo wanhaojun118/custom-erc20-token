@@ -21,6 +21,9 @@ var usdt500Staking;
 var minion1000StakingAbi;
 var minion1000StakingAddress;
 var minion1000Staking;
+var minion1500LpAbi;
+var minion1500LpAddress;
+var minion1500Lp;
 
 const initWeb3 = () => {
     if (window.ethereum) {
@@ -109,6 +112,27 @@ const updateMinion1000StakingContractMinionBalance = async () => {
     const balance = await minion.methods.balanceOf(minion1000StakingAddress).call();
     if(balance){
         document.getElementById("minion1000-staking-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals)
+    }
+}
+
+const updateMinion1500LpTotalEthStake = async () => {
+    const ethTotalStakes = await minion1500Lp.methods.ethTotalStakes().call();
+    if(ethTotalStakes){
+        document.getElementById("minion1500Lp-total-eth-stake").innerHTML = web3.utils.fromWei(ethTotalStakes, "ether");
+    }
+}
+
+const updateMinion1500LpTotalMinionStake = async () => {
+    const minionTotalStakes = await minion1500Lp.methods.minionTotalStakes().call();
+    if(minionTotalStakes){
+        document.getElementById("minion1500Lp-total-minion-stake").innerHTML = (minionTotalStakes / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+    }
+}
+
+const updateMinion1500LpMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(minion1500LpAddress).call();
+    if(balance){
+        document.getElementById("minion1500Lp-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals)
     }
 }
 
@@ -427,6 +451,7 @@ window.addEventListener("load", async () => {
                 });
             });
 
+            // Minion1000 Staking contract
             $.getJSON("Minion1000Staking.json", minion1000ContractFile => {
                 minion1000StakingAbi = minion1000ContractFile.abi;
                 minion1000StakingAddress = minion1000ContractFile.networks["3"].address;
@@ -436,6 +461,18 @@ window.addEventListener("load", async () => {
                 updateMinion1000StakingContractTotalStake();
                 updateMinion1000StakingContractMinionBalance();
             });
+
+            // Minion1500LP contract
+            $.getJSON("Minion1500LP.json", minion1500LpContractFile => {
+                minion1500LpAbi = minion1500LpContractFile.abi;
+                minion1500LpAddress = minion1500LpContractFile.networks["3"].address;
+            }).done(async () => {
+                minion1500Lp = new web3.eth.Contract(minion1500LpAbi, minion1500LpAddress);
+                document.getElementById("minion1500Lp-address").innerHTML = minion1500LpAddress;
+                updateMinion1500LpTotalEthStake();
+                updateMinion1500LpTotalMinionStake();
+                updateMinion1500LpMinionBalance();
+            })
             
             // console.log("checksum address of Tether USDT: ", web3.utils.toChecksumAddress("0x6ee856ae55b6e1a249f04cd3b947141bc146273c"));
         } else {
