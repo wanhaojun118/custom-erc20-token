@@ -3,6 +3,7 @@ var minionAbi;
 var minionAddress;
 var minion;
 var minionDecimals;
+var minionTotalSupply;
 var eth500StakingAbi;
 var eth500StakingAddress;
 var eth500Staking;
@@ -21,9 +22,10 @@ var usdt500Staking;
 var minion1000StakingAbi;
 var minion1000StakingAddress;
 var minion1000Staking;
-var minion1500LpAbi;
-var minion1500LpAddress;
-var minion1500Lp;
+var minion1500lpAbi;
+var minion1500lpAddress;
+var minion1500lp;
+var minionToEthRate;
 
 const initWeb3 = () => {
     if (window.ethereum) {
@@ -94,11 +96,21 @@ const updateUSDT500Allowance = async () => {
     document.getElementById("usdt500-staking-allowance").innerHTML = (allowance / Math.pow(10, usdtDecimals)).toFixed(usdtDecimals);
 }
 
+const updateMinion1500LpAllowance = async () => {
+    const allowance = await minion.methods.allowance(myAddress, minion1500lpAddress).call();
+    document.getElementById("minion1500lp-staking-minion-allowance").innerHTML = (allowance / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+}
+
 const updateMyStake = async () => {
     const myStake = await eth500Staking.methods.stakeOf(myAddress).call();
     if(myStake){
         document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
     }
+}
+
+const updateMinion1000Allowance = async () => {
+    const allowance = await minion.methods.allowance(myAddress, minion1000StakingAddress).call();
+    document.getElementById("minion1000-staking-allowance").innerHTML = (allowance / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
 }
 
 const updateMinion1000StakingContractTotalStake = async () => {
@@ -115,24 +127,31 @@ const updateMinion1000StakingContractMinionBalance = async () => {
     }
 }
 
-const updateMinion1500LpTotalEthStake = async () => {
-    const ethTotalStakes = await minion1500Lp.methods.ethTotalStakes().call();
+const updateminion1500lpTotalEthStake = async () => {
+    const ethTotalStakes = await minion1500lp.methods.ethTotalStakes().call();
     if(ethTotalStakes){
-        document.getElementById("minion1500Lp-total-eth-stake").innerHTML = web3.utils.fromWei(ethTotalStakes, "ether");
+        document.getElementById("minion1500lp-total-eth-stake").innerHTML = web3.utils.fromWei(ethTotalStakes, "ether");
     }
 }
 
-const updateMinion1500LpTotalMinionStake = async () => {
-    const minionTotalStakes = await minion1500Lp.methods.minionTotalStakes().call();
+const updateminion1500lpTotalMinionStake = async () => {
+    const minionTotalStakes = await minion1500lp.methods.minionTotalStakes().call();
     if(minionTotalStakes){
-        document.getElementById("minion1500Lp-total-minion-stake").innerHTML = (minionTotalStakes / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+        document.getElementById("minion1500lp-total-minion-stake").innerHTML = (minionTotalStakes / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
     }
 }
 
-const updateMinion1500LpMinionBalance = async () => {
-    const balance = await minion.methods.balanceOf(minion1500LpAddress).call();
+const updateMinion1500lpEthBalance = async () => {
+    const balance = await web3.eth.getBalance(minion1500lpAddress);
     if(balance){
-        document.getElementById("minion1500Lp-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals)
+        document.getElementById("minion1500lp-contract-eth-balance").innerHTML = web3.utils.fromWei(balance, "ether");
+    }
+}
+
+const updateMinion1500lpMinionBalance = async () => {
+    const balance = await minion.methods.balanceOf(minion1500lpAddress).call();
+    if(balance){
+        document.getElementById("minion1500lp-contract-minion-balance").innerHTML = (balance / Math.pow(10, minionDecimals)).toFixed(minionDecimals)
     }
 }
 
@@ -242,6 +261,193 @@ const checkUSDTAllowance = async () => {
     }
 }
 
+const checkMinion1000Allowance = async () => {
+    const allowance = await minion.methods.allowance(myAddress, minion1000StakingAddress).call();
+    const approveSection = document.getElementById("minion1000-approve-section");
+    const addStakeSection = document.getElementById("minion1000-add-stake-section");
+    const approveButton = document.getElementById("minion1000-approve-button");
+    const addStakeButton = document.getElementById("minion1000-add-stake-button");
+    const minTotalSupply = await minion.methods.totalSupply().call();
+
+    if(allowance <= 0){
+        // Minion1000 Approve
+
+        approveSection.style.display = "block";
+        addStakeSection.style.display = "none";
+
+        approveButton.addEventListener("click", async () => {
+            const approve = await minion.methods.approve(minion1000StakingAddress, minTotalSupply);
+            approve.send({
+                from: myAddress
+            }).on("transactionHash", txHash => {
+                document.getElementById("minion1000-approve-link").href = ropstenTestUrlPrefix + txHash;
+                document.getElementById("minion1000-approve-transaction").style.display = "block";
+            }).on("receipt", receipt => {
+                console.log("Minion1000 approve receipt: ", receipt);
+                checkMinion1000Allowance();
+            }).on("error", (error, receipt) => {
+                console.log("Error in Minion1000 approve trasaction: ", error);
+                if(receipt && Object.keys(receipt).length > 0){
+                    console.log("Error in Minion1000 approve trasaction, receipt: ", receipt);
+                }
+            });
+        });
+    }else{
+        // Minion1000 Add stake
+
+        updateMinion1000Allowance();
+
+        approveSection.style.display = "none";
+        addStakeSection.style.display = "block";
+
+        addStakeButton.addEventListener("click", async () => {
+            const addStakeAmount = document.getElementById("minion1000-add-stake-amount").value * Math.pow(10, minionDecimals);
+            if(addStakeAmount > 0){
+                const minion1000AddStake = await minion1000Staking.methods.addStake(myAddress, addStakeAmount);
+                minion1000AddStake.send({
+                    from: myAddress
+                }).on("transactionHash", txHash => {
+                    document.getElementById("minion1000-add-stake-link").href = ropstenTestUrlPrefix + txHash;
+                    document.getElementById("minion1000-add-stake-transaction").style.display = "block";
+                }).on("receipt", receipt => {
+                    console.log("Minion1000 add stake receipt: ", receipt);
+                    updateMyMinionBalance();
+                    updateMinion1000Allowance();
+                    updateMinion1000StakingContractTotalStake();
+                }).on("error", (error, receipt) => {
+                    console.log("Error in Minion1000 add stake trasaction: ", error);
+                    if(receipt && Object.keys(receipt).length > 0){
+                        console.log("Error in Minion1000 add stake trasaction, receipt: ", receipt);
+                    }
+                });
+            }
+        })
+    }
+}
+
+const checkMinionLpAllowance = async () => {
+    const allowance = await minion.methods.allowance(myAddress, minion1500lpAddress).call();
+    const approveSection = document.getElementById("minion1500lp-approve-section");
+    const addStakeSection = document.getElementById("minion1500lp-add-stake-section");
+    const approveButton = document.getElementById("minion1500lp-approve-button");
+    const addStakeButton = document.getElementById("minion1500lp-add-stake-button");
+    const minTotalSupply = await minion.methods.totalSupply().call();
+
+    if(allowance <= 0){
+        // Minion1500 LP Approve
+
+        approveSection.style.display = "block";
+        addStakeSection.style.display = "none";
+
+        approveButton.addEventListener("click", async () => {
+            const approve = await minion.methods.approve(minion1500lpAddress, minTotalSupply);
+            approve.send({
+                from: myAddress
+            }).on("transactionHash", txHash => {
+                document.getElementById("minion1500lp-approve-link").href = ropstenTestUrlPrefix + txHash;
+                document.getElementById("minion1500lp-approve-transaction").style.display = "block";
+            }).on("receipt", receipt => {
+                console.log("Minion1500 LP approve receipt: ", receipt);
+                updateMinion1500LpAllowance();
+            }).on("error", (error, receipt) => {
+                console.log("Error in Minion1500 LP approve trasaction: ", error);
+                if(receipt && Object.keys(receipt).length > 0){
+                    console.log("Error in Minion1500 LP approve trasaction, receipt: ", receipt);
+                }
+            });
+        });
+    }else{
+        // Minion1500 LP Add stake
+
+        updateMinion1500LpAllowance();
+
+        approveSection.style.display = "none";
+        addStakeSection.style.display = "block";
+
+        const ethInput = document.getElementById("minion1500lp-add-stake-eth-amount");
+        const minionInput = document.getElementById("minion1500lp-add-stake-minion-amount");
+
+        ethInput.addEventListener("change", async(e) => {
+            const ethWithDecimals = web3.utils.toWei(e.target.value, "ether");
+            const convertedMinion = ((ethWithDecimals / minionToEthRate) / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+            minionInput.value = convertedMinion;
+        });
+
+        minionInput.addEventListener("change", async(e) => {
+            const minionWithDecimals = e.target.value * Math.pow(10, minionDecimals);
+            const convertedEth = web3.utils.fromWei((minionWithDecimals * minionToEthRate).toString(), "ether");
+            ethInput.value = convertedEth;
+        });
+
+        addStakeButton.addEventListener("click", async () => {
+            const ethAmount = web3.utils.toWei((document.getElementById("minion1500lp-add-stake-eth-amount").value).toString(), "ether");
+            const minionAmount = document.getElementById("minion1500lp-add-stake-minion-amount").value * Math.pow(10, minionDecimals);
+            if(ethAmount > 0 && minionAmount > 0){
+
+                const minion1500lpAddStake = await minion1500lp.methods.addStake(myAddress, minionAmount);
+                minion1500lpAddStake.send({
+                    from: myAddress,
+                    value: ethAmount
+                }).on("transactionHash", txHash => {
+                    document.getElementById("minion1500lp-add-stake-link").href = ropstenTestUrlPrefix + txHash;
+                    document.getElementById("minion1500lp-add-stake-transaction").style.display = "block";
+                }).on("receipt", receipt => {
+                    console.log("Minion1500 LP add stake receipt: ", receipt);
+                    updateMyMinionBalance();
+                    updateMinion1500LpAllowance();
+                    updateminion1500lpTotalEthStake();
+                    updateminion1500lpTotalMinionStake();
+                }).on("error", (error, receipt) => {
+                    console.log("Error in Minion1500 LP add stake trasaction: ", error);
+                    if(receipt && Object.keys(receipt).length > 0){
+                        console.log("Error in Minion1500 LP add stake trasaction, receipt: ", receipt);
+                    }
+                });
+            }
+        })
+    }
+}
+
+const minion1500lpWithdrawal = () => {
+    const ethInput = document.getElementById("minion1500lp-withdraw-stake-eth-amount");
+    const minionInput = document.getElementById("minion1500lp-withdraw-stake-minion-amount");
+
+    ethInput.addEventListener("change", async(e) => {
+        const ethWithDecimals = web3.utils.toWei(e.target.value, "ether");
+        const convertedMinion = ((ethWithDecimals / minionToEthRate) / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+        minionInput.value = convertedMinion;
+    });
+
+    minionInput.addEventListener("change", async(e) => {
+        const minionWithDecimals = e.target.value * Math.pow(10, minionDecimals);
+        const convertedEth = web3.utils.fromWei((minionWithDecimals * minionToEthRate).toString(), "ether");
+        ethInput.value = convertedEth;
+    });
+
+    document.getElementById("minion1500lp-withdraw-stake-button").addEventListener("click", async () => {
+        const ethAmount = web3.utils.toWei(document.getElementById("minion1500lp-withdraw-stake-eth-amount").value, "ether");
+        const minionAmount = document.getElementById("minion1500lp-withdraw-stake-minion-amount").value * Math.pow(10, minionDecimals);
+        const minion1500lpWithdrawStake = await minion1500lp.methods.withdrawStake(myAddress, minionAmount, ethAmount);
+        minion1500lpWithdrawStake.send({
+            from: myAddress,
+        }).on("transactionHash", txHash => {
+            document.getElementById("minion1500lp-withdraw-stake-link").href = ropstenTestUrlPrefix + txHash;
+            document.getElementById("minion1500lp-withdraw-stake-transaction").style.display = "block";
+        }).on("receipt", receipt => {
+            console.log("Minion1500 LP withdraw stake receipt: ", receipt);
+            updateMyMinionBalance();
+            updateMinion1500LpAllowance();
+            updateminion1500lpTotalEthStake();
+            updateminion1500lpTotalMinionStake();
+        }).on("error", (error, receipt) => {
+            console.log("Error in Minion1500 LP withdraw stake trasaction: ", error);
+            if(receipt && Object.keys(receipt).length > 0){
+                console.log("Error in Minion1500 LP withdraw stake trasaction, receipt: ", receipt);
+            }
+        });
+    })
+}
+
 window.addEventListener("load", async () => {
     if (window.location.href.indexOf("minionTest.html") < 0) {
         window.location.href = window.location.href + "minionTest.html";
@@ -263,6 +469,7 @@ window.addEventListener("load", async () => {
                 document.getElementById("minion-address").innerHTML = minionAddress;
                 if (Object.keys(minion).length > 0) {
                     minionDecimals = await minion.methods.decimals().call();
+                    minionTotalSupply = await minion.methods.totalSupply().call();
                     document.getElementById("my-address").innerHTML = myAddress;
                     updateMyMinionBalance();
                     updateStakingContractMinionBalance();
@@ -460,19 +667,29 @@ window.addEventListener("load", async () => {
                 document.getElementById("minion1000-staking-address").innerHTML = minion1000StakingAddress;
                 updateMinion1000StakingContractTotalStake();
                 updateMinion1000StakingContractMinionBalance();
+
+                checkMinion1000Allowance();
             });
 
-            // Minion1500LP contract
-            $.getJSON("Minion1500LP.json", minion1500LpContractFile => {
-                minion1500LpAbi = minion1500LpContractFile.abi;
-                minion1500LpAddress = minion1500LpContractFile.networks["3"].address;
+            // minion1500lp contract
+            $.getJSON("minion1500LP.json", minion1500lpContractFile => {
+                minion1500lpAbi = minion1500lpContractFile.abi;
+                minion1500lpAddress = minion1500lpContractFile.networks["3"].address;
             }).done(async () => {
-                minion1500Lp = new web3.eth.Contract(minion1500LpAbi, minion1500LpAddress);
-                document.getElementById("minion1500Lp-address").innerHTML = minion1500LpAddress;
-                updateMinion1500LpTotalEthStake();
-                updateMinion1500LpTotalMinionStake();
-                updateMinion1500LpMinionBalance();
-            })
+                minion1500lp = new web3.eth.Contract(minion1500lpAbi, minion1500lpAddress);
+                document.getElementById("minion1500lp-address").innerHTML = minion1500lpAddress;
+                minionToEthRate = await minion1500lp.methods.minionToEthRate().call();
+                updateminion1500lpTotalEthStake();
+                updateminion1500lpTotalMinionStake();
+                updateMinion1500lpEthBalance();
+                updateMinion1500lpMinionBalance();
+
+                // Check Minion1500 LP allowance
+                checkMinionLpAllowance();
+
+                // Withdrawal section
+                minion1500lpWithdrawal();
+            });
             
             // console.log("checksum address of Tether USDT: ", web3.utils.toChecksumAddress("0x6ee856ae55b6e1a249f04cd3b947141bc146273c"));
         } else {

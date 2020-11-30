@@ -15,7 +15,7 @@ contract Minion1500LP {
     uint256 public minionTotalStakes;
     uint256 public ethTotalStakes;
     uint256 internal harvestReserve = 15000000000000;
-    uint256 public minionToEthRate = 1000;
+    uint256 public minionToEthRate = 10000000;
     
     event AddStake(address sender, uint256 minionAmount, uint256 ethAmount);
     event WithdrawStake(address receiver, uint256 minionAmount, uint256 ethAmount);
@@ -119,10 +119,10 @@ contract Minion1500LP {
         _success = (_addStakeRatio == minionToEthRate);
         require(_success, "[WithdrawStake failure] - Withdrawal rate not allowed");
         
-        _success = (_minionBalanceOfContract > _minionAmount);
+        _success = (_minionBalanceOfContract >= _minionAmount);
         require(_success, "[WithdrawStake failure] - Insufficient Minion balance in contract");
         
-        _success = (address(this).balance > _ethAmount);
+        _success = (address(this).balance >= _ethAmount);
         require(_success, "[WithdrawStake failure] - Insufficient ETH balance in contract");
         
         _success = (minionStakes[_stakeholder] >= _minionAmount);

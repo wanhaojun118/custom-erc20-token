@@ -128,17 +128,56 @@
                 <b style="margin-left: 30px;">Pool's total payout per day (MIN): </b><span>20</span>
                 <b style="margin-left: 30px; ">Pool's balance (MIN): </b><span id="minion1000-staking-contract-minion-balance"></span>
             </div>
+            <div id="minion1000-approve-section">
+                <button id="minion1000-approve-button">Approve</button>
+                <div style="display:none;" id="minion1000-approve-transaction"><a target="_blank" id="minion1000-approve-link">Check "Minion1000 Approve" transaction</a></div>
+            </div>
+            <div id="minion1000-add-stake-section">
+                <div>
+                    <label for="minion1000-add-stake-amount">Add stake (MIN): </label>
+                    <input type="number" name="minion1000-add-stake-amount" id="minion1000-add-stake-amount" step="0.01"/>
+                    <button id="minion1000-add-stake-button">Add stake</button>
+                    <div>Staking allowance approved by me: <span id="minion1000-staking-allowance"></span></div>
+                </div>
+                <div style="display:none;" id="minion1000-add-stake-transaction"><a target="_blank" id="minion1000-add-stake-link">Check "Minion1000 Add Stake" transaction</a></div>
+            </div>
         </div>
         <br/>
         <hr/>
         <br/>
         <div>
-            <h3>Minion1500 LP <span id="minion1500Lp-address"></span></h3>
+            <h3>Minion1500 LP <span id="minion1500lp-address"></span></h3>
             <div>
-                <b>Total stake (ETH): </b><span id="minion1500Lp-total-eth-stake"></span>
-                <b style="margin-left: 30px;">Total stake (MIN): </b><span id="minion1500Lp-total-minion-stake"></span>
-                <b style="margin-left: 30px;">Pool's total payout per day (MIN): </b><span>30</span>
-                <b style="margin-left: 30px; ">Pool's balance (MIN): </b><span id="minion1500Lp-contract-minion-balance"></span>
+                <b>Total stake (ETH): </b><span id="minion1500lp-total-eth-stake"></span>
+                <b style="margin-left: 30px;">Total stake (MIN): </b><span id="minion1500lp-total-minion-stake"></span>
+            </div>
+            <div>
+                <b>Pool's total payout per day (MIN): </b><span>30</span>
+                <b style="margin-left: 30px; ">Pool's balance (ETH): </b><span id="minion1500lp-contract-eth-balance"></span>
+                <b style="margin-left: 30px; ">Pool's balance (MIN): </b><span id="minion1500lp-contract-minion-balance"></span>
+            </div>
+            <div id="minion1500lp-approve-section">
+                <button id="minion1500lp-approve-button">Approve</button>
+                <div style="display:none;" id="minion1500lp-approve-transaction"><a target="_blank" id="minion1500lp-approve-link">Check "Minion1500 LP Approve" transaction</a></div>
+            </div>
+            <div id="minion1500lp-add-stake-section">
+                <div>
+                    <span>Add stake: </span>
+                    <input type="number" name="minion1500lp-add-stake-eth-amount" id="minion1500lp-add-stake-eth-amount" step="0.01" min="0.00" /> (ETH)
+                    <input type="number" name="minion1500lp-add-stake-minion-amount" id="minion1500lp-add-stake-minion-amount" step="0.01" min="0.00" /> (MIN)
+                    <button id="minion1500lp-add-stake-button">Add stake</button>
+                    <div>Staking allowance approved by me (MIN): <span id="minion1500lp-staking-minion-allowance"></span></div>
+                </div>
+                <div style="display:none;" id="minion1500lp-add-stake-transaction"><a target="_blank" id="minion1500lp-add-stake-link">Check "Minion1500 LP Add Stake" transaction</a></div>
+            </div>
+            <div id="minion1500lp-withdraw-stake-section">
+                <div>
+                    <span>Withdraw stake: </span>
+                    <input type="number" name="minion1500lp-withdraw-stake-eth-amount" id="minion1500lp-withdraw-stake-eth-amount" step="0.01" min="0.00" /> (ETH)
+                    <input type="number" name="minion1500lp-withdraw-stake-minion-amount" id="minion1500lp-withdraw-stake-minion-amount" step="0.01" min="0.00" /> (MIN)
+                    <button id="minion1500lp-withdraw-stake-button">Withdraw stake</button>
+                </div>
+                <div style="display:none;" id="minion1500lp-withdraw-stake-transaction"><a target="_blank" id="minion1500lp-withdraw-stake-link">Check "Minion1500 LP Withdraw Stake" transaction</a></div>
             </div>
         </div>
     </div>
