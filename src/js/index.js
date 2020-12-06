@@ -449,252 +449,248 @@ const minion1500lpWithdrawal = () => {
 }
 
 window.addEventListener("load", async () => {
-    if (window.location.href.indexOf("minionTest.html") < 0) {
-        window.location.href = window.location.href + "minionTest.html";
-    } else {
-        // Initialize web3 object
-        if (initWeb3()) {
-            console.log("web3 ready...");
-            console.log("web3 version: ", web3.version);
+    // Initialize web3 object
+    if (initWeb3()) {
+        console.log("web3 ready...");
+        console.log("web3 version: ", web3.version);
 
-            const accountAddresses = await web3.eth.getAccounts();
-            myAddress = accountAddresses[0];
+        const accountAddresses = await web3.eth.getAccounts();
+        myAddress = accountAddresses[0];
 
-            // Minion contract
-            $.getJSON("Minion.json", (minionContractFile) => {
-                minionAbi = minionContractFile.abi;
-                minionAddress = minionContractFile.networks["3"].address;
-            }).done(async () => {
-                minion = new web3.eth.Contract(minionAbi, minionAddress);
-                document.getElementById("minion-address").innerHTML = minionAddress;
-                if (Object.keys(minion).length > 0) {
-                    minionDecimals = await minion.methods.decimals().call();
-                    minionTotalSupply = await minion.methods.totalSupply().call();
-                    document.getElementById("my-address").innerHTML = myAddress;
-                    updateMyMinionBalance();
-                    updateStakingContractMinionBalance();
-                    updateUSDT500StakingContractMinionBalance();
+        // Minion contract
+        $.getJSON("Minion.json", (minionContractFile) => {
+            minionAbi = minionContractFile.abi;
+            minionAddress = minionContractFile.networks["3"].address;
+        }).done(async () => {
+            minion = new web3.eth.Contract(minionAbi, minionAddress);
+            document.getElementById("minion-address").innerHTML = minionAddress;
+            if (Object.keys(minion).length > 0) {
+                minionDecimals = await minion.methods.decimals().call();
+                minionTotalSupply = await minion.methods.totalSupply().call();
+                document.getElementById("my-address").innerHTML = myAddress;
+                updateMyMinionBalance();
+                updateStakingContractMinionBalance();
+                updateUSDT500StakingContractMinionBalance();
 
-                    // Transfer Minion
-                    const sendMinionBtn = document.getElementById("send-minion-button");
-                    if (sendMinionBtn) {
-                        sendMinionBtn.addEventListener("click", async () => {
-                            const transferAmount = document.getElementById("transfer-amount").value;
-                            const transferTo = document.getElementById("transfer-to").value;
+                // Transfer Minion
+                const sendMinionBtn = document.getElementById("send-minion-button");
+                if (sendMinionBtn) {
+                    sendMinionBtn.addEventListener("click", async () => {
+                        const transferAmount = document.getElementById("transfer-amount").value;
+                        const transferTo = document.getElementById("transfer-to").value;
 
-                            if (transferAmount && transferTo) {
-                                const minionWithDecimals = transferAmount * Math.pow(10, minionDecimals);
+                        if (transferAmount && transferTo) {
+                            const minionWithDecimals = transferAmount * Math.pow(10, minionDecimals);
 
-                                const transfer = await minion.methods.transfer(transferTo, minionWithDecimals);
-                                const tx = transfer.send({
-                                    from: myAddress
-                                }).on("transactionHash", txHash => {
-                                    console.log("tx hash: ", txHash);
-                                    document.getElementById("transfer-minion-link").href = ropstenTestUrlPrefix + txHash;
-                                    document.getElementById("transfer-minion-transaction").style.visibility = "visible";
-                                }).on("receipt", receipt => {
-                                    console.log("Transfer Minion receipt: ", receipt);
-                                    updateMyMinionBalance();
-                                    updateStakingContractMinionBalance();
-                                    updateUSDT500StakingContractMinionBalance
-                                }).on("error", (error, receipt) => {
-                                    console.log("Error in transfer Minion: ", error);
-                                    if(receipt && Object.keys(receipt).length > 0){
-                                        console.log("Error in transfer Minion, receipt: ", receipt);
-                                    }
-                                });
+                            const transfer = await minion.methods.transfer(transferTo, minionWithDecimals);
+                            const tx = transfer.send({
+                                from: myAddress
+                            }).on("transactionHash", txHash => {
+                                console.log("tx hash: ", txHash);
+                                document.getElementById("transfer-minion-link").href = ropstenTestUrlPrefix + txHash;
+                                document.getElementById("transfer-minion-transaction").style.visibility = "visible";
+                            }).on("receipt", receipt => {
+                                console.log("Transfer Minion receipt: ", receipt);
+                                updateMyMinionBalance();
+                                updateStakingContractMinionBalance();
+                                updateUSDT500StakingContractMinionBalance
+                            }).on("error", (error, receipt) => {
+                                console.log("Error in transfer Minion: ", error);
+                                if(receipt && Object.keys(receipt).length > 0){
+                                    console.log("Error in transfer Minion, receipt: ", receipt);
+                                }
+                            });
+                        }
+                    });
+                }
+            } else {
+                console.error("Error in reading Minion contract");
+            }
+        });
+
+        // ETH500 Staking contract
+        $.getJSON("ETH500Staking.json", (eth500StakingContractFile) => {
+            eth500StakingAbi = eth500StakingContractFile.abi;
+            eth500StakingAddress = eth500StakingContractFile.networks["3"].address;
+        }).done(async () => {
+            eth500Staking = new web3.eth.Contract(eth500StakingAbi, eth500StakingAddress);
+            document.getElementById("staking-contract-address").innerHTML = eth500StakingAddress;
+            if (Object.keys(eth500Staking).length > 0) {
+                updateTotalStake();
+                updateMyStake();
+
+                // Check user available stake
+                // checkStakeInterval = setInterval(async () => {
+                //     let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
+
+                //     toggleWithdrawStakeFeature(myStake);
+
+                //     document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
+                // }, 3000);
+
+                // Add stake
+                document.getElementById("add-stake-button").addEventListener("click", async () => {
+                    const stake = document.getElementById("add-stake-amount").value;
+
+                    if (stake) {
+                        const stakeInWei = web3.utils.toWei(stake, "ether");
+                        console.log("stake in wei: ", stakeInWei);
+
+                        const addStake = await eth500Staking.methods.addStake();
+                        const tx = await addStake.send({
+                            from: myAddress,
+                            value: stakeInWei,
+                            // gasPrice: web3.utils.toWei("21", "gwei"),
+                            // gas: 21000
+                        }).on("transactionHash", txHash => {
+                            if (txHash) {
+                                console.log("tx hash: ", txHash);
+                                document.getElementById("add-stake-link").href =  ropstenTestUrlPrefix + txHash;
+                                document.getElementById("add-stake-transaction").style.visibility = "visible";
+                            }
+                        }).on("receipt", async receipt => {
+                            console.log("Add stake receipt: ", receipt);
+                            
+                            updateTotalStake();
+                            updateMyStake();
+                            getRoi();
+                        }).on("error", (error, receipt) => {
+                            console.log("Error in withdraw stake: ", error);
+                            if(receipt && Object.keys(receipt).length > 0){
+                                console.log("Error in withdraw stake, receipt: ", receipt);
                             }
                         });
                     }
-                } else {
-                    console.error("Error in reading Minion contract");
-                }
-            });
-
-            // ETH500 Staking contract
-            $.getJSON("ETH500Staking.json", (eth500StakingContractFile) => {
-                eth500StakingAbi = eth500StakingContractFile.abi;
-                eth500StakingAddress = eth500StakingContractFile.networks["3"].address;
-            }).done(async () => {
-                eth500Staking = new web3.eth.Contract(eth500StakingAbi, eth500StakingAddress);
-                document.getElementById("staking-contract-address").innerHTML = eth500StakingAddress;
-                if (Object.keys(eth500Staking).length > 0) {
-                    updateTotalStake();
-                    updateMyStake();
-
-                    // Check user available stake
-                    // checkStakeInterval = setInterval(async () => {
-                    //     let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
-
-                    //     toggleWithdrawStakeFeature(myStake);
-
-                    //     document.getElementById("my-stake").innerHTML = web3.utils.fromWei(myStake, "ether");
-                    // }, 3000);
-
-                    // Add stake
-                    document.getElementById("add-stake-button").addEventListener("click", async () => {
-                        const stake = document.getElementById("add-stake-amount").value;
-
-                        if (stake) {
-                            const stakeInWei = web3.utils.toWei(stake, "ether");
-                            console.log("stake in wei: ", stakeInWei);
-
-                            const addStake = await eth500Staking.methods.addStake();
-                            const tx = await addStake.send({
-                                from: myAddress,
-                                value: stakeInWei,
-                                // gasPrice: web3.utils.toWei("21", "gwei"),
-                                // gas: 21000
-                            }).on("transactionHash", txHash => {
-                                if (txHash) {
-                                    console.log("tx hash: ", txHash);
-                                    document.getElementById("add-stake-link").href =  ropstenTestUrlPrefix + txHash;
-                                    document.getElementById("add-stake-transaction").style.visibility = "visible";
-                                }
-                            }).on("receipt", async receipt => {
-                                console.log("Add stake receipt: ", receipt);
-                                
-                                updateTotalStake();
-                                updateMyStake();
-                                getRoi();
-                            }).on("error", (error, receipt) => {
-                                console.log("Error in withdraw stake: ", error);
-                                if(receipt && Object.keys(receipt).length > 0){
-                                    console.log("Error in withdraw stake, receipt: ", receipt);
-                                }
-                            });
-                        }
-                    });
-
-                    // Withdraw stake
-                    document.getElementById("withdraw-stake-button").addEventListener("click", async () => {
-                        const withdrawStakeAmount = document.getElementById("withdraw-stake-amount").value;
-                        
-                        if(withdrawStakeAmount && parseFloat(withdrawStakeAmount) > 0){
-                            const withdrawStakeInWei = web3.utils.toWei(withdrawStakeAmount, "ether");
-                            const withdrawStake = await eth500Staking.methods.withdrawStake(myAddress, withdrawStakeInWei);
-                            withdrawStake.send({
-                                from: myAddress,
-                                // gasPrice: web3.utils.toWei("21", "gwei"),
-                                // gas: 21000
-                            }).on("transactionHash", txHash => {
-                                console.log("withdraw stake transaction hash: ", txHash);
-                                document.getElementById("withdraw-stake-link").href =  ropstenTestUrlPrefix + txHash;
-                                document.getElementById("withdraw-stake-transaction").style.visibility = "visible";
-                            }).on("receipt", receipt => {
-                                console.log("withdraw stake receipt: ", receipt);
-                                updateTotalStake();
-                                updateMyStake();
-                                getRoi();
-                            }).on("error", (error, receipt) => {
-                                console.log("Error in withdraw stake: ", error);
-                                if(receipt && Object.keys(receipt).length > 0){
-                                    console.log("Error in withdraw stake, receipt: ", receipt);
-                                }
-                            });
-                        }
-                    });
-
-                    // Get max available stake upon withdrawal
-                    document.getElementById("max-withdraw-stake").addEventListener("click", async () => {
-                        let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
-                        document.getElementById("withdraw-stake-amount").value = web3.utils.fromWei(myStake, "ether");
-                    });
-
-                    // Get stakeholders list
-                    const stakeholders = await eth500Staking.methods.getStakeholders().call();
-                    if(stakeholders.length > 0){
-                        document.getElementById("empty-stakeholder-message").style.display = "none";
-                        const stakeholderList = document.getElementById("stakeholder-list");
-                        
-                        for(let stakeholder of stakeholders){
-                            const li = document.createElement("li");
-                            const stakeholderAddress = document.createTextNode(stakeholder);
-                            li.appendChild(stakeholderAddress);
-                            stakeholderList.appendChild(li);
-                        }
-                    }else{
-                        document.getElementById("empty-stakeholder-message").style.display = "block";
-                    }
-
-                    // Get my ROI
-                    // const stakeholders = await eth500Staking.methods.getStakeholders().call();
-                    getRoi();
-                } else {
-                    console.error("Error in reading ETH 500 staking contract");
-                }
-            });
-
-            // USDT500 Staking contract
-            $.getJSON("USDT500Staking.json", usdt500StakingContractFile => {
-                usdt500StakingAbi = usdt500StakingContractFile.abi;
-                usdt500StakingAddress = usdt500StakingContractFile.networks["3"].address;
-            }).done(async () => {
-                usdt500Staking = new web3.eth.Contract(usdt500StakingAbi, usdt500StakingAddress);
-                document.getElementById("usdt500-staking-address").innerHTML = usdt500StakingAddress;
-                const totalStake = await usdt500Staking.methods.totalStakes().call();
-                document.getElementById("usdt500-total-stake").innerHTML = totalStake;
-
-                // USDT contract
-                $.getJSON("USDT.json", usdtContractFile => {
-                    usdtAbi = usdtContractFile.abi;
-                    usdtAddress = usdtContractFile.networks["3"].address;
-                }).done(async () => {
-                    
-                    usdt = new web3.eth.Contract(usdtAbi, usdtAddress);
-                    usdtTotalSupply = await usdt.methods.totalSupply().call();
-                    usdtDecimals = await usdt.methods.decimals().call();
-
-                    document.getElementById("usdt-address").innerHTML = usdtAddress;
-                    document.getElementById("my-usdt-address").innerHTML = myAddress;
-
-                    updateMyUSDTBalance();
-                    updateUSDT500StakingContractTotalStake();
-                    updateUSDT500StakingContractMinionBalance();
-                    updateUSDT500Allowance();
-
-                    // Check contract's allowance approved by user
-                    checkUSDTAllowance();
                 });
-            });
 
-            // Minion1000 Staking contract
-            $.getJSON("Minion1000Staking.json", minion1000ContractFile => {
-                minion1000StakingAbi = minion1000ContractFile.abi;
-                minion1000StakingAddress = minion1000ContractFile.networks["3"].address;
+                // Withdraw stake
+                document.getElementById("withdraw-stake-button").addEventListener("click", async () => {
+                    const withdrawStakeAmount = document.getElementById("withdraw-stake-amount").value;
+                    
+                    if(withdrawStakeAmount && parseFloat(withdrawStakeAmount) > 0){
+                        const withdrawStakeInWei = web3.utils.toWei(withdrawStakeAmount, "ether");
+                        const withdrawStake = await eth500Staking.methods.withdrawStake(myAddress, withdrawStakeInWei);
+                        withdrawStake.send({
+                            from: myAddress,
+                            // gasPrice: web3.utils.toWei("21", "gwei"),
+                            // gas: 21000
+                        }).on("transactionHash", txHash => {
+                            console.log("withdraw stake transaction hash: ", txHash);
+                            document.getElementById("withdraw-stake-link").href =  ropstenTestUrlPrefix + txHash;
+                            document.getElementById("withdraw-stake-transaction").style.visibility = "visible";
+                        }).on("receipt", receipt => {
+                            console.log("withdraw stake receipt: ", receipt);
+                            updateTotalStake();
+                            updateMyStake();
+                            getRoi();
+                        }).on("error", (error, receipt) => {
+                            console.log("Error in withdraw stake: ", error);
+                            if(receipt && Object.keys(receipt).length > 0){
+                                console.log("Error in withdraw stake, receipt: ", receipt);
+                            }
+                        });
+                    }
+                });
+
+                // Get max available stake upon withdrawal
+                document.getElementById("max-withdraw-stake").addEventListener("click", async () => {
+                    let myStake = await eth500Staking.methods.stakeOf(myAddress).call();
+                    document.getElementById("withdraw-stake-amount").value = web3.utils.fromWei(myStake, "ether");
+                });
+
+                // Get stakeholders list
+                const stakeholders = await eth500Staking.methods.getStakeholders().call();
+                if(stakeholders.length > 0){
+                    document.getElementById("empty-stakeholder-message").style.display = "none";
+                    const stakeholderList = document.getElementById("stakeholder-list");
+                    
+                    for(let stakeholder of stakeholders){
+                        const li = document.createElement("li");
+                        const stakeholderAddress = document.createTextNode(stakeholder);
+                        li.appendChild(stakeholderAddress);
+                        stakeholderList.appendChild(li);
+                    }
+                }else{
+                    document.getElementById("empty-stakeholder-message").style.display = "block";
+                }
+
+                // Get my ROI
+                // const stakeholders = await eth500Staking.methods.getStakeholders().call();
+                getRoi();
+            } else {
+                console.error("Error in reading ETH 500 staking contract");
+            }
+        });
+
+        // USDT500 Staking contract
+        $.getJSON("USDT500Staking.json", usdt500StakingContractFile => {
+            usdt500StakingAbi = usdt500StakingContractFile.abi;
+            usdt500StakingAddress = usdt500StakingContractFile.networks["3"].address;
+        }).done(async () => {
+            usdt500Staking = new web3.eth.Contract(usdt500StakingAbi, usdt500StakingAddress);
+            document.getElementById("usdt500-staking-address").innerHTML = usdt500StakingAddress;
+            const totalStake = await usdt500Staking.methods.totalStakes().call();
+            document.getElementById("usdt500-total-stake").innerHTML = totalStake;
+
+            // USDT contract
+            $.getJSON("USDT.json", usdtContractFile => {
+                usdtAbi = usdtContractFile.abi;
+                usdtAddress = usdtContractFile.networks["3"].address;
             }).done(async () => {
-                minion1000Staking = new web3.eth.Contract(minion1000StakingAbi, minion1000StakingAddress);
-                document.getElementById("minion1000-staking-address").innerHTML = minion1000StakingAddress;
-                updateMinion1000StakingContractTotalStake();
-                updateMinion1000StakingContractMinionBalance();
+                
+                usdt = new web3.eth.Contract(usdtAbi, usdtAddress);
+                usdtTotalSupply = await usdt.methods.totalSupply().call();
+                usdtDecimals = await usdt.methods.decimals().call();
 
-                checkMinion1000Allowance();
+                document.getElementById("usdt-address").innerHTML = usdtAddress;
+                document.getElementById("my-usdt-address").innerHTML = myAddress;
+
+                updateMyUSDTBalance();
+                updateUSDT500StakingContractTotalStake();
+                updateUSDT500StakingContractMinionBalance();
+                updateUSDT500Allowance();
+
+                // Check contract's allowance approved by user
+                checkUSDTAllowance();
             });
+        });
 
-            // minion1500lp contract
-            $.getJSON("minion1500LP.json", minion1500lpContractFile => {
-                minion1500lpAbi = minion1500lpContractFile.abi;
-                minion1500lpAddress = minion1500lpContractFile.networks["3"].address;
-            }).done(async () => {
-                minion1500lp = new web3.eth.Contract(minion1500lpAbi, minion1500lpAddress);
-                document.getElementById("minion1500lp-address").innerHTML = minion1500lpAddress;
-                minionToEthRate = await minion1500lp.methods.minionToEthRate().call();
-                updateminion1500lpTotalEthStake();
-                updateminion1500lpTotalMinionStake();
-                updateMinion1500lpEthBalance();
-                updateMinion1500lpMinionBalance();
+        // Minion1000 Staking contract
+        $.getJSON("Minion1000Staking.json", minion1000ContractFile => {
+            minion1000StakingAbi = minion1000ContractFile.abi;
+            minion1000StakingAddress = minion1000ContractFile.networks["3"].address;
+        }).done(async () => {
+            minion1000Staking = new web3.eth.Contract(minion1000StakingAbi, minion1000StakingAddress);
+            document.getElementById("minion1000-staking-address").innerHTML = minion1000StakingAddress;
+            updateMinion1000StakingContractTotalStake();
+            updateMinion1000StakingContractMinionBalance();
 
-                // Check Minion1500 LP allowance
-                checkMinionLpAllowance();
+            checkMinion1000Allowance();
+        });
 
-                // Withdrawal section
-                minion1500lpWithdrawal();
-            });
-            
-            // console.log("checksum address of Tether USDT: ", web3.utils.toChecksumAddress("0x6ee856ae55b6e1a249f04cd3b947141bc146273c"));
-        } else {
-            alert("Please use a Ethereum-compatible browser or extension like Metamask");
-        }
+        // minion1500lp contract
+        $.getJSON("minion1500LP.json", minion1500lpContractFile => {
+            minion1500lpAbi = minion1500lpContractFile.abi;
+            minion1500lpAddress = minion1500lpContractFile.networks["3"].address;
+        }).done(async () => {
+            minion1500lp = new web3.eth.Contract(minion1500lpAbi, minion1500lpAddress);
+            document.getElementById("minion1500lp-address").innerHTML = minion1500lpAddress;
+            minionToEthRate = await minion1500lp.methods.minionToEthRate().call();
+            updateminion1500lpTotalEthStake();
+            updateminion1500lpTotalMinionStake();
+            updateMinion1500lpEthBalance();
+            updateMinion1500lpMinionBalance();
+
+            // Check Minion1500 LP allowance
+            checkMinionLpAllowance();
+
+            // Withdrawal section
+            minion1500lpWithdrawal();
+        });
+        
+        // console.log("checksum address of Tether USDT: ", web3.utils.toChecksumAddress("0x6ee856ae55b6e1a249f04cd3b947141bc146273c"));
+    } else {
+        alert("Please use a Ethereum-compatible browser or extension like Metamask");
     }
 });
 

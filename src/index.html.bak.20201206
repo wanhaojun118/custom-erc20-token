@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial scale=1" />
+  <title>New Token Demo</title>
+
+  <link href="css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container ">
+    <div id="head" class="row">
+      <div class="col lg 12">
+        <h2 class="text-center">New Token Sale</h2>
+        <hr />
+      </div>
+    </div>
+    <div id="loader">
+      <p class="text-center">Loading...</p>
+    </div>
+    <div id="content" class="text-center" style="display: none;">
+      <div>
+        <p>Token price is <b><span id="token-price"></span></b> Ether.
+          You currently have <b><span id="token-balance"></span></b> N3
+        </p>
+      </div>
+      <div>
+        <form onSubmit="App.buyTokens(); return false;">
+          <div class="form-group">
+            <input type="number" id="number-of-token" name="number-of-token" class="form-control input-lg" value="1"
+              min="1" pattern="[0-9]" />
+          </div>
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-primary btn-lg">Buy Token(s)</button>
+          </span>
+        </form>
+        <br />
+        <div class="progress">
+          <div id="progress" class="progress-bar progress-bar-stripped active" aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+        <div class="token-sold">
+          <b><span id="token-sold"></span></b> token(s) sold
+          <!-- <span id="token-available"></span> tokens sold -->
+        </div>
+        <div class="token-left">
+          <b><span id="token-left"></span></b> token(s) left
+        </div>
+        <br />
+        <div class="account">
+          Your Account: <span id="account"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/jquery-3.5.1.min.js"></script>
+  <script src="js/popper.min.js"> </script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/truffle-contract.min.js"></script>
+  <!-- <script src="js/app.js"></script> -->
+  <script src="js/index.js"></script>
+</body>
+
+</html>
