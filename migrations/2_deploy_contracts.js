@@ -11,7 +11,7 @@
 // const Curve500Staking = artifacts.require("./Curve500Staking.sol");
 /*** End: These contracts have been deployed ***/
 
-// const Banana = artifacts.require("Banana.sol");
+const Banana = artifacts.require("Banana.sol");
 const BananaCrowdsaleFirst = artifacts.require("BananaCrowdsaleFirst.sol");
 const BananaCrowdsaleSecond = artifacts.require("BananaCrowdsaleSecond.sol");
 
@@ -26,17 +26,18 @@ module.exports = async function (deployer) {
   // await deployer.deploy(Curve);
   // await deployer.deploy(Curve500Staking, Curve.address);
   /*** End: These contracts have been deployed ***/
+
   const weiToBananaRate = 10;
   const myWallet = "0x65a4aA4832155FFf1BCFbb8774EADaF0572636f0";
   const bananaContractAddress = "0x1879CeA4f55999e6A2FAEdbCbe3E8d93dB9a3909";
-  const openingTimeFirst = 1608442200;
-  const closingTimeFirst = 1609084800;
-  const openingTimeSecond = 1609084800;
-  const closingTimeSecond = 1609689600;
+  const openingTimeFirst = 1609408800;
+  const closingTimeFirst = 1610035200;
+  const openingTimeSecond = 1610035200;
+  const closingTimeSecond = 1610640000;
 
-  // await deployer.deploy(Banana);
-  await deployer.deploy(BananaCrowdsaleFirst, weiToBananaRate, myWallet, bananaContractAddress, 
-    myWallet, openingTimeFirst, closingTimeFirst, bananaContractAddress);
-  await deployer.deploy(BananaCrowdsaleSecond, weiToBananaRate, myWallet, bananaContractAddress, 
-    myWallet, openingTimeSecond, closingTimeSecond, bananaContractAddress);
+  await deployer.deploy(Banana);
+  await deployer.deploy(BananaCrowdsaleFirst, weiToBananaRate, myWallet, Banana.address, 
+    myWallet, openingTimeFirst, closingTimeFirst, Banana.address);
+  await deployer.deploy(BananaCrowdsaleSecond, weiToBananaRate, myWallet, Banana.address, 
+    myWallet, openingTimeSecond, closingTimeSecond, Banana.address);
 };
