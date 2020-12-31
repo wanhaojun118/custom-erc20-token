@@ -111,9 +111,7 @@ const buyBananaToken = async () => {
 
     if(buyAmount){
         let buyAmountWithDecimals = bananaDecimalsConverter(buyAmount, false);
-        console.log("buy amount with decimals: ", buyAmountWithDecimals);
         let weiToPay = buyAmountWithDecimals / bananaCrowdsaleRate;
-        console.log("wei to pay: ", weiToPay);
 
         if(weiToPay){
             const buyBanana = await bananaCrowdsaleFirst.methods.buyTokens(myAddress);
