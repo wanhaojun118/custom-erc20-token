@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial scale=1" />
-    <title>Minion Test</title>
+    <title>Banana Test</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <style>
         #max-withdraw-stake {
@@ -20,30 +20,57 @@
 
 <body>
     <div style="padding: 20px 10px;">
-        <div class="d-flex align-items-center justify-content-center">
-            <h4>Banana Crowdsale</h4>
+        <div class="d-flex flex-column align-items-center justify-content-center px-3">
+            <h4>Banana Crowdsale <span id="banana-crowdsale-first-address"></span></h4>
+            <div class="d-flex flex-row justify-content-around w-100">
+                <div><b>Token(s) available: </b><span id="banana-crowdsale-token-available"></span></div>
+                <div><b>Token(s) sold: </b><span id="banana-crowdsale-token-sold"></span></div>
+            </div>
+            <div class="d-flex flex-row justify-content-around w-100">
+                <div><b>Opening Time: </b><span id="banana-crowdsale-opening-time"></span></div>
+                <div><b>Closing Time: </b><span id="banana-crowdsale-closing-time"></span></div>
+            </div>
+            <div class="d-flex flex-row justify-content-around w-100">
+                <div><b>Crowdsale Status: </b><span id="banana-crowdsale-status"></span></div>
+            </div>
+            <div class="mt-3 w-50" style="align-self: flex-start; border: 1px solid #28a745; border-radius: 10px; padding: 20px;">
+                <h6><u>Buy Token Form (<span id="eth-to-banana-rate"></span>)</u></h6>
+                <div class="mt-3">
+                    <label for="banana-crowdsale-buy-amount">Amount (BNANA): </label>
+                    <input type="number" class="form-control" id="banana-crowdsale-buy-amount" name="banana-crowdsale-buy-amount" min="0.00" step="0.01" />
+                </div>
+                <div class="mt-3"><button class="btn btn-success" style="color: #fff;" id="banana-crowdsale-buy-button">Buy</button></div>
+            </div>
         </div>
         <hr/>
         <div class="d-flex flex-column align-items-center justify-content-center px-3">
             <h4>Banana Token (<span id="banana-symbol"></span>) <span id="banana-address"></span></h4>
-            <div class="d-flex flex-row justify-content-around w-100">
-                <div>My address: <span id="my-address"></span></div>
+            <div class="d-flex flex-row justify-content-center w-100">
+                <div><b>My address: </b><span id="my-address"></span></div>
             </div>
             <div class="d-flex flex-row justify-content-around w-100">
-                <div>Total Supply: <span id="banana-total-supply"></span></div>
-                <div>My balance (BNANA): <span id="my-banana-balance"></span></div>
+                <div><b>Total Supply: </b><span id="banana-total-supply"></span></div>
+                <div><b>My balance (BNANA): </b><span id="my-banana-balance"></span></div>
             </div>
             <div class="mt-3 w-50" style="align-self: flex-start; border: 1px solid orange; border-radius: 10px; padding: 20px;">
                 <h6><u>Crowdsale Approval Form (for admin use only)</u></h6>
-                <div>
+                <div class="mt-3">
                     <label for="approval-spender">Banana Spender: </label>
                     <input type="text" class="form-control" id="approval-spender" name="approval-spender" />
                 </div>
-                <div>
+                <div class="mt-3">
                     <label for="approval-amount">Amount (BNANA): </label>
                     <input type="number" class="form-control" id="approval-amount" name="approval-amount" min="0.00" step="0.01" />
                 </div>
+                <div class="mt-3">
+                    <label for="approval-amount">Without Decimal Conversion</label>
+                    <input type="checkbox" id="without-decimal-conversion" name="without-decimal-conversion" />
+                </div>
                 <div class="mt-3"><button class="btn btn-warning" style="color: #fff;" id="banana-approve-button">Approve</button></div>
+                <div class="mt-3">
+                    <button class="btn btn-success" style="color: #fff;" id="banana-increase-allowance-button">Increase Allowance</button>
+                    <button class="btn btn-danger" style="color: #fff;" id="banana-decrease-allowance-button">Decrease Allowance</button>
+                </div>             
                 <div class="mt-3">Crowdsale allowance (BNANA): <span id="crowdsale-allowance"></span></div>
             </div>
         </div>
@@ -57,4 +84,5 @@
     <script src="js/compound.js"></script>
     <script src="js/curve.js"></script>
     <script src="js/bananaCrowdsale.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </body>
