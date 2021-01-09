@@ -9,11 +9,13 @@
 // const Compound500Staking = artifacts.require("./Compound500Staking.sol");
 // const Curve = artifacts.require("./Curve.sol");
 // const Curve500Staking = artifacts.require("./Curve500Staking.sol");
+
+// const Banana = artifacts.require("Banana.sol");
+// const BananaCrowdsaleFirst = artifacts.require("BananaCrowdsaleFirst.sol");
+// const BananaCrowdsaleSecond = artifacts.require("BananaCrowdsaleSecond.sol");
 /*** End: These contracts have been deployed ***/
 
-const Banana = artifacts.require("Banana.sol");
-const BananaCrowdsaleFirst = artifacts.require("BananaCrowdsaleFirst.sol");
-const BananaCrowdsaleSecond = artifacts.require("BananaCrowdsaleSecond.sol");
+const Banana2500LP = artifacts.require("Banana2500LP.sol");
 
 module.exports = async function (deployer) {
   /*** These contracts have been deployed ***/
@@ -25,19 +27,21 @@ module.exports = async function (deployer) {
   // await deployer.deploy(Compound500Staking, Compound.address);
   // await deployer.deploy(Curve);
   // await deployer.deploy(Curve500Staking, Curve.address);
+  // await deployer.deploy(Minion1500LP);
+
+  // const weiToBananaRate = 1;
+  // const myWallet = "0x65a4aA4832155FFf1BCFbb8774EADaF0572636f0";
+  // const openingTimeFirst = 1610181300;
+  // const closingTimeFirst = 1610899200;
+  // const openingTimeSecond = 1610899200;
+  // const closingTimeSecond = 1611504000;
+
+  // await deployer.deploy(Banana);
+  // await deployer.deploy(BananaCrowdsaleFirst, weiToBananaRate, myWallet, Banana.address, 
+  //   myWallet, openingTimeFirst, closingTimeFirst, Banana.address);
+  // await deployer.deploy(BananaCrowdsaleSecond, weiToBananaRate, myWallet, Banana.address, 
+  //   myWallet, openingTimeSecond, closingTimeSecond, Banana.address);
   /*** End: These contracts have been deployed ***/
 
-  const weiToBananaRate = 10;
-  const myWallet = "0x65a4aA4832155FFf1BCFbb8774EADaF0572636f0";
-  const bananaContractAddress = "0x1879CeA4f55999e6A2FAEdbCbe3E8d93dB9a3909";
-  const openingTimeFirst = 1609408800;
-  const closingTimeFirst = 1610035200;
-  const openingTimeSecond = 1610035200;
-  const closingTimeSecond = 1610640000;
-
-  await deployer.deploy(Banana);
-  await deployer.deploy(BananaCrowdsaleFirst, weiToBananaRate, myWallet, Banana.address, 
-    myWallet, openingTimeFirst, closingTimeFirst, Banana.address);
-  await deployer.deploy(BananaCrowdsaleSecond, weiToBananaRate, myWallet, Banana.address, 
-    myWallet, openingTimeSecond, closingTimeSecond, Banana.address);
+  await deployer.deploy(Banana2500LP, "0xcaC50A89493dD922bf349d54EF7C909db8Fff9AB");
 };

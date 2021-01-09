@@ -4,6 +4,8 @@ var bananaCrowdsaleFirst, bananaCrowdsaleFirstAbi, bananaCrowdsaleFirstAddress, 
     bananaCrowdsaleClosingTime, bananaCrowdsaleIsOpen;
 var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var days = ['Sun','Mon','Tue','Wed','Thur','Fri','Sat'];
+var banana2500lp, banana2500lpAbi, banana2500lpAddress;
+var ethDecimals = 18;
 
 const bananaDecimalsConverter = (bananaAmount, toHuman = true) => {
     if(bananaAmount){
@@ -101,9 +103,17 @@ const getBananaCrowdsaleStatus = async () => {
 }
 
 const getEthToBananaRate = async () => {
-    if(bananaCrowdsaleRate){
-        document.getElementById("eth-to-banana-rate").innerHTML = "1 ETH = " + bananaCrowdsaleRate + " BNANA";
+    let decimalDifference;
+    let statement;
+    if(ethDecimals > bananaDecimals){
+        decimalDifference = ethDecimals - bananaDecimals;
+        statement = "1 ETH = " + Math.pow(10, decimalDifference) + " BNANA";
+    }else{
+        decimalDifference = bananaDecimals - ethDecimals;
+        statement = "1 BNANA = " + Math.pow(10, decimalDifference) + " ETH";
     }
+        
+    document.getElementById("tokens-rate").innerHTML = statement;
 }
 
 const buyBananaToken = async () => {
@@ -135,13 +145,25 @@ const buyBananaToken = async () => {
     }
 }
 
+const getBanana2500lpHarvestReserved = async () => {
+    const bananaTotalStake = await banana2500lp.methods.bananaTotalStakes().call();
+    const bananaBalanceOfContract = await banana.methods.balanceOf(banana2500lpAddress).call();
+
+    if(bananaTotalStake && bananaBalanceOfContract){
+        const harvestReserved = bananaDecimalsConverter(bananaBalanceOfContract - bananaTotalStake);
+        document.getElementById("banana-2500-lp-harvest-reserved").innerHTML = harvestReserved;
+    }
+}
+
 window.addEventListener("load", async() => {
     if(initWeb3()){
         $.getJSON("Banana.json", bananaContractFile => {
             bananaAbi = bananaContractFile.abi;
             bananaAddress = bananaContractFile.networks["3"].address;
         }).done(async () => {
-            // Read Banana crowdsale contract
+            /********************************************/
+            /****** Read Banana crowdsale contract ******/
+            /********************************************/
             $.getJSON("BananaCrowdsaleFirst.json", bananaCrowdsaleFirst => {
                 bananaCrowdsaleFirstAbi = bananaCrowdsaleFirst.abi;
                 bananaCrowdsaleFirstAddress = bananaCrowdsaleFirst.networks["3"].address;
@@ -173,6 +195,18 @@ window.addEventListener("load", async() => {
             document.getElementById("banana-approve-button").addEventListener("click", (e) => approveCrowdsale(e));
             document.getElementById("banana-increase-allowance-button").addEventListener("click", (e) => approveCrowdsale(e));
             document.getElementById("banana-decrease-allowance-button").addEventListener("click", (e) => approveCrowdsale(e));
+
+            /********************************************/
+            /******* Read Banana 2500 LP contract *******/
+            /********************************************/
+            $.getJSON("Banana2500LP.json", banana2500lpContractFile => {
+                banana2500lpAbi = banana2500lpContractFile.abi;
+                banana2500lpAddress = banana2500lpContractFile.networks["3"].address;
+            }).done(async() => {
+                banana2500lp = new web3.eth.Contract(banana2500lpAbi, banana2500lpAddress);
+                document.getElementById("banana-2500-lp-address").innerHTML = banana2500lpAddress;
+                getBanana2500lpHarvestReserved();
+            });
         });
     }
 });

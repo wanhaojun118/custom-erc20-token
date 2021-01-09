@@ -25,7 +25,7 @@ var minion1000Staking;
 var minion1500lpAbi;
 var minion1500lpAddress;
 var minion1500lp;
-var minionToEthRate;
+var minionToWeiRate;
 
 const initWeb3 = () => {
     if (window.ethereum) {
@@ -427,7 +427,7 @@ const checkMinionLpAllowance = async () => {
         if(ethInput){
             ethInput.addEventListener("change", async(e) => {
                 const ethWithDecimals = web3.utils.toWei(e.target.value, "ether");
-                const convertedMinion = ((ethWithDecimals / minionToEthRate) / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+                const convertedMinion = ((ethWithDecimals / minionToWeiRate) / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
                 minionInput.value = convertedMinion;
             });
         }
@@ -435,7 +435,7 @@ const checkMinionLpAllowance = async () => {
         if(minionInput){
             minionInput.addEventListener("change", async(e) => {
                 const minionWithDecimals = e.target.value * Math.pow(10, minionDecimals);
-                const convertedEth = web3.utils.fromWei((minionWithDecimals * minionToEthRate).toString(), "ether");
+                const convertedEth = web3.utils.fromWei((minionWithDecimals * minionToWeiRate).toString(), "ether");
                 ethInput.value = convertedEth;
             });
         }
@@ -480,7 +480,7 @@ const minion1500lpWithdrawal = () => {
     if(ethInput){
         ethInput.addEventListener("change", async(e) => {
             const ethWithDecimals = web3.utils.toWei(e.target.value, "ether");
-            const convertedMinion = ((ethWithDecimals / minionToEthRate) / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
+            const convertedMinion = ((ethWithDecimals / minionToWeiRate) / Math.pow(10, minionDecimals)).toFixed(minionDecimals);
             minionInput.value = convertedMinion;
         });
     }
@@ -488,7 +488,7 @@ const minion1500lpWithdrawal = () => {
     if(minionInput){
         minionInput.addEventListener("change", async(e) => {
             const minionWithDecimals = e.target.value * Math.pow(10, minionDecimals);
-            const convertedEth = web3.utils.fromWei((minionWithDecimals * minionToEthRate).toString(), "ether");
+            const convertedEth = web3.utils.fromWei((minionWithDecimals * minionToWeiRate).toString(), "ether");
             ethInput.value = convertedEth;
         });
     }
@@ -785,7 +785,7 @@ window.addEventListener("load", async () => {
             if(document.getElementById("minion1500lp-address")){
                 document.getElementById("minion1500lp-address").innerHTML = minion1500lpAddress;
             }
-            minionToEthRate = await minion1500lp.methods.minionToEthRate().call();
+            minionToWeiRate = await minion1500lp.methods.minionToWeiRate().call();
             updateminion1500lpTotalEthStake();
             updateminion1500lpTotalMinionStake();
             updateMinion1500lpEthBalance();

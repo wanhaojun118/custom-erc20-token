@@ -118,12 +118,12 @@ contract Banana2500LP {
     {
         uint256 _bananaBalanceOfContract = BananaInstance.balanceOf(address(this));
         
-        uint256 _bananaToWeiAddRatio = SafeMath.div(_ethAmount, _bananaAmount);
-        _success = (_bananaToWeiAddRatio == bananaToWeiRate);
+        uint256 _bananaToWeiWithdrawalRatio = SafeMath.div(_ethAmount, _bananaAmount);
+        _success = (_bananaToWeiWithdrawalRatio == bananaToWeiRate);
         require(_success, "[WithdrawStake failure] - Banana to Wei rate not allowed");
         
-        uint256 _weiToBananaAddRatio = SafeMath.mul(_bananaAmount, bananaToWeiRate);
-        _success = (_weiToBananaAddRatio == _ethAmount);
+        uint256 _weiToBananaWithdrawalRatio = SafeMath.mul(_bananaAmount, bananaToWeiRate);
+        _success = (_weiToBananaWithdrawalRatio == _ethAmount);
         require(_success, "[WithdrawStake failure] - Wei to Banana rate not allowed");
         
         _success = (_bananaBalanceOfContract >= _bananaAmount);
