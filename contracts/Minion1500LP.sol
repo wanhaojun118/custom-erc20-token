@@ -15,7 +15,7 @@ contract Minion1500LP {
     uint256 public minionTotalStakes;
     uint256 public ethTotalStakes;
     uint256 internal harvestReserve = 15000000000000;
-    uint256 public minionToEthRate = 10000000;
+    uint256 public minionToWeiRate = 10000000;
     
     event AddStake(address sender, uint256 minionAmount, uint256 ethAmount);
     event WithdrawStake(address receiver, uint256 minionAmount, uint256 ethAmount);
@@ -76,9 +76,13 @@ contract Minion1500LP {
         _success = (msg.value > 0);
         require(_success, "[AddStake failure] - ETH amount cannot be 0");
         
-        uint256 _addStakeRatio = SafeMath.div(msg.value, _amount);
-        _success = (_addStakeRatio == minionToEthRate);
-        require(_success, "[AddStake failure] - Staking rate not allowed");
+        uint256 _minionToWeiAddRatio = SafeMath.div(msg.value, _amount);
+        _success = (_minionToWeiAddRatio == minionToWeiRate);
+        require(_success, "[AddStake failure] - Minion to Wei rate not allowed");
+        
+        uint256 _weiToMinionAddRatio = SafeMath.mul(_amount, minionToWeiRate);
+        _success = (_weiToMinionAddRatio == msg.value);
+        require(_success, "[AddStake failure] - Wei to Minion rate not allowed");
         
         _success = (MinionInstance.transferFrom(_stakeholder, address(this), _amount));
         require(_success, "[AddStake failure] - Stake amount not being credited to contract balance");
@@ -115,9 +119,13 @@ contract Minion1500LP {
     {
         uint256 _minionBalanceOfContract = MinionInstance.balanceOf(address(this));
         
-        uint256 _addStakeRatio = SafeMath.div(_ethAmount, _minionAmount);
-        _success = (_addStakeRatio == minionToEthRate);
-        require(_success, "[WithdrawStake failure] - Withdrawal rate not allowed");
+        uint256 _minionToWeiWithdrawalRatio = SafeMath.div(_ethAmount, _minionAmount);
+        _success = (_minionToWeiWithdrawalRatio == minionToWeiRate);
+        require(_success, "[WithdrawStake failure] - Minion to Wei rate not allowed");
+        
+        uint256 _weiToMinionWithdrawalRatio = SafeMath.mul(_minionAmount, minionToWeiRate);
+        _success = (_weiToMinionWithdrawalRatio == _ethAmount);
+        require(_success, "[WithdrawStake failure] - Wei to Minion rate not allowed");
         
         _success = (_minionBalanceOfContract >= _minionAmount);
         require(_success, "[WithdrawStake failure] - Insufficient Minion balance in contract");
