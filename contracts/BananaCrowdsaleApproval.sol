@@ -18,7 +18,7 @@ contract BananaCrowdsaleApproval {
     }
     
     function isCrowdsaleParticipants(address _address)
-        internal
+        public
         view
         returns (bool)
     {
