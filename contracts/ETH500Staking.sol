@@ -7,6 +7,7 @@ contract ETH500Staking {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
+    address MinionAddress = 0x1f1402A0Ce2d989c881A3120F77434c352D02564;
     IERC20 public MinionInstance;
     address[] internal stakeholders;
     mapping(address => uint256) internal stakes; // Stakeholder's stake(s)
@@ -16,8 +17,8 @@ contract ETH500Staking {
     event WithdrawStake(address receiver, uint256 amount);
     event HarvestInterest(address stakeholder, uint256 amount);
 
-    constructor(address _MinionAddress) public {
-        MinionInstance = ERC20(_MinionAddress); // Assign minion contract
+    constructor() public {
+        MinionInstance = ERC20(MinionAddress); // Assign minion contract
     }
 
     // To check if address is one of the stakeholders

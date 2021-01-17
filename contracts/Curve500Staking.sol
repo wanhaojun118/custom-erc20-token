@@ -8,8 +8,9 @@ contract Curve500Staking {
     using SafeMath for uint256;
     
     IERC20 public CurveInstance;
+    address CurveAddress = 0xb09D67821498F1883B7f3882d3C8b8Ad3B6d1519;
     IERC20 public MinionInstance;
-    address MinionAddress = 0x6d00B05F25F740231c76261D8Fa1F132DFA4Bc23;
+    address MinionAddress = 0x1f1402A0Ce2d989c881A3120F77434c352D02564;
     address[] internal stakeholders;
     mapping(address => uint256) internal stakes; // Stakeholder's stake(s)
     uint256 public totalStakes;
@@ -18,8 +19,8 @@ contract Curve500Staking {
     event WithdrawStake(address receiver, uint256 amount);
     event HarvestInterest(address stakeholder, uint256 amount);
     
-    constructor(address _curveAddress) public {
-        CurveInstance = ERC20(_curveAddress);
+    constructor() public {
+        CurveInstance = ERC20(CurveAddress);
         MinionInstance = ERC20(MinionAddress);
     }
     

@@ -8,7 +8,9 @@ contract USDT500Staking {
     using SafeMath for uint256;
     
     IERC20 public USDTInstance;
+    address USDTAddress = 0x88f723E5E38345c296ad76d3a7560bb995ED2F78;
     IERC20 public MinionInstance;
+    address MinionAddress = 0x1f1402A0Ce2d989c881A3120F77434c352D02564;
     address[] internal stakeholders;
     mapping(address => uint256) internal stakes; // Stakeholder's stake(s)
     uint256 public totalStakes;
@@ -17,9 +19,9 @@ contract USDT500Staking {
     event WithdrawStake(address receiver, uint256 amount);
     event HarvestInterest(address stakeholder, uint256 amount);
     
-    constructor(address _USDTAddress, address _MinionAddress) public {
-        USDTInstance = ERC20(_USDTAddress);
-        MinionInstance = ERC20(_MinionAddress);
+    constructor() public {
+        USDTInstance = ERC20(USDTAddress);
+        MinionInstance = ERC20(MinionAddress);
     }
     
     function isStakeholder(address _address)

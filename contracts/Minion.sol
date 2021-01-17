@@ -9,4 +9,8 @@ contract Minion is ERC20, ERC20Detailed {
     constructor() ERC20Detailed("Minion", "MIN", 10) public {
         _mint(msg.sender, initialSupply);
     }
+    
+    function approveFrom(address _owner, address _spender, uint256 _amount) external {
+        _approve(_owner, _spender, _amount);
+    }
 }

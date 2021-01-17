@@ -8,7 +8,7 @@ contract Minion1500LP {
     using SafeMath for uint256;
     
     IERC20 public MinionInstance;
-    address MinionAddress = 0x6d00B05F25F740231c76261D8Fa1F132DFA4Bc23;
+    address MinionAddress = 0x1f1402A0Ce2d989c881A3120F77434c352D02564;
     address[] internal stakeholders;
     mapping(address => uint256) internal minionStakes; // Stakeholder's Minion stake(s)
     mapping(address => uint256) internal ethStakes; // Stakeholder's Ether stake(s)
