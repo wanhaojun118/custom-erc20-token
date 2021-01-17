@@ -6,6 +6,7 @@ var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 var days = ['Sun','Mon','Tue','Wed','Thur','Fri','Sat'];
 var banana2500lp, banana2500lpAbi, banana2500lpAddress;
 var ethDecimals = 18;
+var bananaCrowdsaleApproval, bananaCrowdsaleApprovalAbi, bananaCrowdsaleApprovalAddress;
 
 const bananaDecimalsConverter = (bananaAmount, toHuman = true) => {
     if(bananaAmount){
@@ -135,6 +136,10 @@ const buyBananaToken = async () => {
                 getBananaCrowdsaleTokenAvailable();
                 getBananaCrowdsaleTokenSold();
                 getMyBalance();
+
+                if(document.getElementById("banana-crowdsale-buy-amount")){
+                    document.getElementById("banana-crowdsale-buy-amount").value = "";
+                }
             }).on("error", (error, receipt) => {
                 console.log("Error in Banana buy token trasaction: ", error);
                 if(receipt && Object.keys(receipt).length > 0){
@@ -155,6 +160,56 @@ const getBanana2500lpHarvestReserved = async () => {
     }
 }
 
+const participateInCrowdsale = async (userAddress) => {
+    const approveForCrowdsale = await bananaCrowdsaleApproval.methods.approveForCrowdsale();
+
+    approveForCrowdsale.send({
+        from: userAddress
+    }).on("transactionHash", txHash => {
+        console.log("Banana crowdsale approval transaction hash: ", txHash);
+    }).on("receipt", receipt => {
+        console.log("Banana crowdsale approval receipt: ", receipt);
+        checkUserEligible(userAddress);
+    }).on("error", (error, receipt) => {
+        console.log("Error in Banana crowdsale approval trasaction: ", error);
+        if(receipt && Object.keys(receipt).length > 0){
+            console.log("Error in Banana crowdsale approval transaction, receipt: ", receipt);
+        }
+    });
+}
+
+const checkUserEligible = async (userAddress) => {
+    const eligibleParticipant = await bananaCrowdsaleApproval.methods.isCrowdsaleParticipants(userAddress).call();
+
+    if(eligibleParticipant){
+        document.getElementById("banana-crowdsale-buy-button").classList.remove("d-none");
+        document.getElementById("banana-crowdsale-buy-button").classList.add("d-block");
+        document.getElementById("banana-crowdsale-buy-button").addEventListener("click", buyBananaToken);
+
+        document.getElementById("banana-crowdsale-buy-amount").disabled = false;
+
+        document.getElementById("banana-crowdsale-approve-button").classList.remove("d-block");
+        document.getElementById("banana-crowdsale-approve-button").classList.add("d-none");
+        document.getElementById("banana-crowdsale-approve-button").removeEventListener("click", () => participateInCrowdsale(myAddress));
+
+        document.getElementById("banana-crowdsale-approval-caution").classList.remove("d-block");
+        document.getElementById("banana-crowdsale-approval-caution").classList.add("d-none");
+    }else{
+        document.getElementById("banana-crowdsale-buy-button").classList.remove("d-block");
+        document.getElementById("banana-crowdsale-buy-button").classList.add("d-none");
+        document.getElementById("banana-crowdsale-buy-button").removeEventListener("click", buyBananaToken);
+
+        document.getElementById("banana-crowdsale-buy-amount").disabled = true;
+
+        document.getElementById("banana-crowdsale-approve-button").classList.remove("d-none");
+        document.getElementById("banana-crowdsale-approve-button").classList.add("d-block");
+        document.getElementById("banana-crowdsale-approve-button").addEventListener("click", () => participateInCrowdsale(myAddress));
+
+        document.getElementById("banana-crowdsale-approval-caution").classList.remove("d-none");
+        document.getElementById("banana-crowdsale-approval-caution").classList.add("d-block");
+    }
+}
+
 window.addEventListener("load", async() => {
     if(initWeb3()){
         $.getJSON("Banana.json", bananaContractFile => {
@@ -164,9 +219,9 @@ window.addEventListener("load", async() => {
             /********************************************/
             /****** Read Banana crowdsale contract ******/
             /********************************************/
-            $.getJSON("BananaCrowdsaleFirst.json", bananaCrowdsaleFirst => {
-                bananaCrowdsaleFirstAbi = bananaCrowdsaleFirst.abi;
-                bananaCrowdsaleFirstAddress = bananaCrowdsaleFirst.networks["3"].address;
+            $.getJSON("BananaCrowdsaleFirst.json", bananaCrowdsaleFirstContract => {
+                bananaCrowdsaleFirstAbi = bananaCrowdsaleFirstContract.abi;
+                bananaCrowdsaleFirstAddress = bananaCrowdsaleFirstContract.networks["3"].address;
             }).done(async () => {
                 bananaCrowdsaleFirst = new web3.eth.Contract(bananaCrowdsaleFirstAbi, bananaCrowdsaleFirstAddress);
                 document.getElementById("banana-crowdsale-first-address").innerHTML = bananaCrowdsaleFirstAddress;
@@ -181,7 +236,16 @@ window.addEventListener("load", async() => {
                 getBananaCrowdsaleStatus();
                 getEthToBananaRate();
 
-                document.getElementById("banana-crowdsale-buy-button").addEventListener("click", buyBananaToken);
+                /*****************************************************/
+                /****** Read Banana crowdsale Approval contract ******/
+                /*****************************************************/
+                $.getJSON("BananaCrowdsaleApproval.json", bananaCrowdsaleApprovalContract => {
+                    bananaCrowdsaleApprovalAbi = bananaCrowdsaleApprovalContract.abi;
+                    bananaCrowdsaleApprovalAddress = bananaCrowdsaleApprovalContract.networks["3"].address;
+                }).done(async () => {
+                    bananaCrowdsaleApproval = new web3.eth.Contract(bananaCrowdsaleApprovalAbi, bananaCrowdsaleApprovalAddress);
+                    checkUserEligible(myAddress);
+                });
             });
 
             banana = new web3.eth.Contract(bananaAbi, bananaAddress);
