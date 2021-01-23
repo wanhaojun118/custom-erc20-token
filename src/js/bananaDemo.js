@@ -93,13 +93,60 @@ const getBananCrowdsaleOpeningAndClosingTime = async () => {
     }
 }
 
+const checkCrowdsaleFinalized = async () => {
+    const finalized = await bananaCrowdsaleFirst.methods.finalized().call();
+
+    if(finalized){
+        // Disable terminate button
+        document.getElementById("banana-crowdsale-finalize").disabled = true;
+
+        // Add event listener for finalize button
+        document.getElementById("banana-crowdsale-finalize").removeEventListener("click", finalizeCrowdsale);
+
+        document.getElementById("banana-crowdsale-finalize-status").innerHTML = "Finalized";
+        document.getElementById("banana-crowdsale-finalize-status").style.color = "#28a745";
+    }else{
+        // Enable terminate button
+        document.getElementById("banana-crowdsale-finalize").disabled = false;
+
+        // Add event listener for finalize button
+        document.getElementById("banana-crowdsale-finalize").addEventListener("click", finalizeCrowdsale);
+
+        document.getElementById("banana-crowdsale-finalize-status").innerHTML = "Pending finalize";
+        document.getElementById("banana-crowdsale-finalize-status").style.color = "#ffc107";
+    }
+}
+
+const finalizeCrowdsale = async () => {
+    await bananaCrowdsaleFirst.methods.finalize().send({
+        from: myAddress
+    }).on("transactionHash", txHash => {
+        console.log("Finalize Banana crowdsale transaction hash: ", txHash);
+    }).on("receipt", receipt => {
+        console.log("Finalize Banana crowdsale receipt: ", receipt);
+        if(confirm("Banana crowdsale ended, please refresh your page. Refresh now?")){
+            location.reload();
+        }
+    }).on("error", (error, receipt) => {
+        console.log("Error in Finalize Banana crowdsale trasaction: ", error);
+        if(receipt && Object.keys(receipt).length > 0){
+            console.log("Error in Finalize Banana crowdsale trasaction, receipt: ", receipt);
+        }
+    });
+}
+
 const getBananaCrowdsaleStatus = async () => {
     if(bananaCrowdsaleIsOpen){
         document.getElementById("banana-crowdsale-status").innerHTML = "Available";
         document.getElementById("banana-crowdsale-status").style.color = "#28a745";
+
+        document.getElementById("banana-crowdsale-finalize-status").innerHTML = "Crowdsale still opening";
+        document.getElementById("banana-crowdsale-finalize-status").style.color = "#808080";
     }else{
         document.getElementById("banana-crowdsale-status").innerHTML = "Not Available";
         document.getElementById("banana-crowdsale-status").style.color = "#ff0000";
+
+        checkCrowdsaleFinalized();
     }
 }
 
